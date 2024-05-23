@@ -27,7 +27,7 @@ int main(void)
 		draw_player(map, grid);
 		rays = raytracing(map, size, dimensions1, grid, rays);
 		draw_walls(display, rays, size, thickness, dimensions2);
-		draw_sprite("sprite", display);
+		// draw_sprite("sprite", display);
         draw_grid(map, grid, dimensions1, size);
         if (events(grid, size) == 1)
             break;
