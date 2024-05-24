@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #define PI 3.14159265358979
 #define DEG 0.0174533
-float theta = PI / 2, dx, dy;
+float theta = PI / 2, dx, dy, strafe;
 float posX = 264, posY = 48;
 float raytheta;
 
@@ -58,13 +58,13 @@ coordsf horizontal(float raytheta, int size, coords dimensions, cell **grid)
 	{
 		ray.y = (((int)posY >> 4) << 4) - .0001;
 		ray.x = (posY - ray.y) / (-tan(raytheta)) + posX;
-		offset.y = -size, offset.x = -offset.y / (-tan(raytheta));
+		offset.y = -size, offset.x = offset.y / tan(raytheta);
 	}
 	if (raytheta < PI)
 	{
 		ray.y = (((int)posY >> 4) << 4) + size;
 		ray.x = (posY - ray.y) / (-tan(raytheta)) + posX;
-		offset.y = size, offset.x = -offset.y / (-tan(raytheta));
+		offset.y = size, offset.x = offset.y / tan(raytheta);
 	}
 	if (raytheta == 0 || raytheta == PI)
 		ray.x = posX, ray.y = posY, dof = 0;
@@ -96,19 +96,19 @@ coordsf vertical(float raytheta, int size, coords dimensions, cell **grid)
 	{
 		ray.x = (((int)posX >> 4) << 4) - .0001;
 		ray.y = (posX - ray.x) * (-tan(raytheta)) + posY;
-		offset.x = -size, offset.y = -offset.x * (-tan(raytheta));
+		offset.x = -size, offset.y = offset.x * tan(raytheta);
 	}
 	if (raytheta < (PI / 2) || raytheta > ((3 * PI) / 2))
 	{
 		ray.x = (((int)posX >> 4) << 4) + size;
 		ray.y = (posX - ray.x) * (-tan(raytheta)) + posY;
-		offset.x = size, offset.y = -offset.x * (-tan(raytheta));
+		offset.x = size, offset.y = offset.x * tan(raytheta);
 	}
 	if (raytheta == 0 || raytheta == PI)
 		ray.x = posX, ray.y = posY, dof = 0;
 	while (dof < 32)
 	{
-		map.x = ftoi((int)ray.x >> 4), map.y = ((int)ray.y >> 4);
+		map.x = (int)ray.x >> 4, map.y = ((int)ray.y >> 4);
 		if (0 <= map.x && map.x < dimensions.x && 0 <= map.y && map.y < dimensions.y && grid[map.x][map.y].state == 1)
 		{
 			length = distance(posX, posY, ray.x, ray.y, raytheta);
@@ -178,32 +178,20 @@ void draw_sprite(char *file, SDL_instance instance)
 	SDL_RenderDrawPoint(instance.renderer, pos.x * 16, pos.y * 16);
 }
 
-int ftoi(float x)
-{
-    int int_part = (int)x;
-    float decimal_part = x - int_part;
-
-    if (decimal_part >= 0.5)
-        return ceil(x);
-    else
-        return floor(x);
-}
-
 void poll_controls(cell **grid)
 {
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-
+	
+	strafe = theta - 90 * DEG;
 	if (keystate[SDL_SCANCODE_LEFT])
 	{
 		theta -= .025;
-		dx = cos(theta);
-		dy = sin(theta);
+		dx = cos(theta), dy = sin(theta);
 	}
 		if (keystate[SDL_SCANCODE_RIGHT])
 	{
 		theta += .025;
-		dx = cos(theta);
-		dy = sin(theta);
+		dx = cos(theta), dy = sin(theta);
 	}
 	if (keystate[SDL_SCANCODE_W])
 	{
@@ -220,7 +208,17 @@ void poll_controls(cell **grid)
 			posY -= dy;
 	}
 	if (keystate[SDL_SCANCODE_A])
-		posX -= dx, posY += dy;
+	{
+		if (grid[(int)((posX -= cos(strafe) / 4) / 16)][(int)(posY / 16)].state != 1)
+			posX -= cos(strafe) / 4;
+		if (grid[(int)(posX / 16)][(int)((posY -= sin(strafe) / 4) / 16)].state != 1)
+			posY -= sin(strafe) / 4;		
+	}
 	if (keystate[SDL_SCANCODE_D])
-		posX += dx, posY -= dy;
+	{
+		if (grid[(int)((posX += cos(strafe) / 4) / 16)][(int)(posY / 16)].state != 1)
+			posX += cos(strafe) / 4;
+		if (grid[(int)(posX / 16)][(int)((posY += sin(strafe) / 4) / 16)].state != 1)
+			posY += sin(strafe) / 4;		
+	}
 }
