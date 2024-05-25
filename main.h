@@ -13,7 +13,6 @@ typedef struct cell
     int x, y;
     int size;
     int state;
-	int neighbors;
 } cell;
 
 typedef struct coords
@@ -24,9 +23,13 @@ typedef struct coords
 typedef struct coordsf
 {
 	float x, y;
-	float val;
-	int dir;
 } coordsf;
+
+typedef struct ray
+{
+	coordsf pos;
+	float val, theta, dir;
+} ray;
 
 typedef struct frontier
 {
@@ -36,9 +39,16 @@ typedef struct frontier
 
 typedef struct rgba
 {
-	int r, g, b;
-	int a;
+	int r, g, b, a;
 } rgba;
+
+typedef struct sprite
+{
+	int hostility;
+	coordsf pos;
+	float z, theta;
+	rgba **texture;
+} sprite;
 
 int instantiate(SDL_instance *instance, coords dimensions, char *name, coords pos);
 void draw_grid(SDL_instance instance, cell **grid, coords dimensions, int cellSize);
@@ -47,12 +57,12 @@ int events(cell **grid, int size);
 void free_grid(cell **grid, int rows);
 void draw_player(SDL_instance instance, cell **grid);
 void poll_controls(cell **grid);
-coordsf *raytracing(SDL_instance instance, int size, coords dimensions, cell **grid, coordsf *rays);
+ray *raytracing(SDL_instance instance, int size, coords dimensions, cell **grid, ray *rays);
 float distance(float ax ,float ay, float bx, float by, float tau);
-coordsf horizontal(float raytau, int size, coords dimensions, cell **grid);
-coordsf vertical(float raytau, int size, coords dimensions, cell **grid);
+ray horizontal(float raytau, int size, coords dimensions, cell **grid);
+ray vertical(float raytau, int size, coords dimensions, cell **grid);
 int ftoi(float x);
-void draw_walls(SDL_instance instance, coordsf *rays, int size, int thickness, coords resolution);
+void draw_walls(SDL_instance instance, ray *rays, int size, int thickness, coords resolution);
 void maze(cell **grid, coords first, coords range);
 frontier *add(frontier **head, coords new);
 frontier *get(frontier *head, int index);
@@ -61,6 +71,6 @@ int listlen(const frontier *h);
 rgba **init_wall(char *file);
 void patch(cell **grid, coords size, coords pos);
 rgba **init_sprite(char *file);
-void draw_sprite(char *file, SDL_instance instance);
+void draw_sprite(SDL_instance map , SDL_instance display);
 
 #endif

@@ -33,7 +33,7 @@ cell **init_grid(coords res, int cellSize)
 
 void draw_grid(SDL_instance instance, cell **grid, coords dimensions, int cellSize)
 {
-	SDL_SetRenderDrawColor(instance.renderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(instance.renderer, 0, 0, 0, 0);
 	int size = grid[0][0].size;
 	for (int i = 0; i < dimensions.x / cellSize; i++)
 		for (int j = 0; j < dimensions.y / cellSize; j++)
@@ -41,8 +41,6 @@ void draw_grid(SDL_instance instance, cell **grid, coords dimensions, int cellSi
 			SDL_Rect cell = {i * size, j * size, size, size};
 			if (grid[i][j].state == 1)
 				SDL_RenderFillRect(instance.renderer, &cell);
-			// else
-			// 	SDL_RenderDrawRect(instance.renderer, &cell);
 		}
 }
 
