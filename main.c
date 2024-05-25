@@ -8,11 +8,11 @@ int main(void)
 	int size = 16, i, thickness = 1;
 	coords dimensions1 = {33 * size, 55 * size};
 	coords pos1 = {100, 25};
-	coords dimensions2 = {1280, 720};
+	coords dimensions2 = {1260, 720};
 	coords pos2 = {1000, 100};
 	cell **grid = init_grid(dimensions1, size);
-	ray *rays = malloc(sizeof(ray) * 1280);
-	SDL_Rect sky = {0, 0, 1280, 360};
+	ray *rays = malloc(sizeof(ray) * 1260);
+	SDL_Rect sky = {0, 0, 1260, 360};
 
 	if (instantiate(&map, dimensions1, "map", pos1) != 0)
 		return (1);
@@ -27,7 +27,7 @@ int main(void)
 		draw_player(map, grid);
 		rays = raytracing(map, size, dimensions1, grid, rays);
 		draw_walls(display, rays, size, thickness, dimensions2);
-		draw_sprite(map, display);
+		draw_sprite(map, display, rays);
         draw_grid(map, grid, dimensions1, size);
         if (events(grid, size) == 1)
             break;

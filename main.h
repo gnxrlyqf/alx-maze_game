@@ -59,8 +59,8 @@ void draw_player(SDL_instance instance, cell **grid);
 void poll_controls(cell **grid);
 ray *raytracing(SDL_instance instance, int size, coords dimensions, cell **grid, ray *rays);
 float distance(float ax ,float ay, float bx, float by, float tau);
-ray horizontal(float raytau, int size, coords dimensions, cell **grid);
-ray vertical(float raytau, int size, coords dimensions, cell **grid);
+ray horizontal(float raytau, int size, coords dim, cell **grid);
+ray vertical(float raytau, int size, coords dim, cell **grid);
 int ftoi(float x);
 void draw_walls(SDL_instance instance, ray *rays, int size, int thickness, coords resolution);
 void maze(cell **grid, coords first, coords range);
@@ -71,6 +71,6 @@ int listlen(const frontier *h);
 rgba **init_wall(char *file);
 void patch(cell **grid, coords size, coords pos);
 rgba **init_sprite(char *file);
-void draw_sprite(SDL_instance map , SDL_instance display);
+void draw_sprite(SDL_instance map , SDL_instance display, ray *rays);
 
 #endif

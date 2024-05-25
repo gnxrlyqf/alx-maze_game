@@ -6,7 +6,7 @@
 #define RAD 57.2957795
 float theta = PI / 2, dx, dy, strafe;
 float posX = 264, posY = 48;
-float raytheta;
+float rtheta;
 
 void draw_player(SDL_instance instance, cell **grid)
 {
@@ -16,28 +16,28 @@ void draw_player(SDL_instance instance, cell **grid)
 	SDL_RenderFillRect(instance.renderer, &player);
 }
 
-ray *raytracing(SDL_instance instance, int size, coords dimensions, cell **grid, ray *rays)
+ray *raytracing(SDL_instance instance, int size, coords dim, cell **grid, ray *rays)
 {
-	dimensions.x = dimensions.x / size;
-	dimensions.y = dimensions.y / size;
-	raytheta = theta - (DEG * 40);
+	dim.x = dim.x / size;
+	dim.y = dim.y / size;
+	rtheta = theta - (DEG * 30);
 	int i;
 	ray ray, hor, ver;
 
-	for (int i = 0; i < 1280; i++)
+	for (int i = 0; i < 1260; i++)
 	{
-		ver = vertical(raytheta, size, dimensions, grid);
-		hor = horizontal(raytheta, size, dimensions, grid);
+		ver = vertical(rtheta, size, dim, grid);
+		hor = horizontal(rtheta, size, dim, grid);
 		if (hor.val < ver.val)
-			rays[i].pos.x = hor.pos.x, rays[i].pos.y = hor.pos.y, rays[i].val = hor.val, rays[i].theta = raytheta, rays[i].dir = 1;
+			rays[i].pos.x = hor.pos.x, rays[i].pos.y = hor.pos.y, rays[i].val = hor.val, rays[i].theta = rtheta, rays[i].dir = 1;
 		if (ver.val < hor.val)
-			rays[i].pos.x = ver.pos.x, rays[i].pos.y = ver.pos.y, rays[i].val = ver.val, rays[i].theta = raytheta, rays[i].dir = 0;
+			rays[i].pos.x = ver.pos.x, rays[i].pos.y = ver.pos.y, rays[i].val = ver.val, rays[i].theta = rtheta, rays[i].dir = 0;
 		SDL_RenderDrawLine(instance.renderer, posX, posY, rays[i].pos.x, rays[i].pos.y);
-		raytheta += DEG / 16;
-		if (raytheta < 0)
-			raytheta += 2 * PI;
-		if (raytheta > 2 * PI)
-			raytheta -= 2 * PI;
+		rtheta += DEG / 21;
+		if (rtheta < 0)
+			rtheta += 2 * PI;
+		if (rtheta > 2 * PI)
+			rtheta -= 2 * PI;
 	}
 	return (rays);
 }
@@ -47,7 +47,7 @@ float distance(float ax ,float ay, float bx, float by, float theta)
 	return(sqrt(pow(bx - ax, 2) + pow(by - ay, 2)));
 }
 
-ray horizontal(float raytheta, int size, coords dimensions, cell **grid)
+ray horizontal(float rtheta, int size, coords dim, cell **grid)
 {
 	coordsf offset, horizontal = {posX, posY};
 	ray ray, out;
@@ -56,26 +56,26 @@ ray horizontal(float raytheta, int size, coords dimensions, cell **grid)
 	float length = 999999999;
 
 	out.val = 0;
-	if (raytheta > PI)
+	if (rtheta > PI)
 	{
 		ray.pos.y = (((int)posY >> 4) << 4) - .0001;
-		ray.pos.x = (posY - ray.pos.y) / (-tan(raytheta)) + posX;
-		offset.y = -size, offset.x = offset.y / tan(raytheta);
+		ray.pos.x = (posY - ray.pos.y) / (-tan(rtheta)) + posX;
+		offset.y = -size, offset.x = offset.y / tan(rtheta);
 	}
-	if (raytheta < PI)
+	if (rtheta < PI)
 	{
 		ray.pos.y = (((int)posY >> 4) << 4) + size;
-		ray.pos.x = (posY - ray.pos.y) / (-tan(raytheta)) + posX;
-		offset.y = size, offset.x = offset.y / tan(raytheta);
+		ray.pos.x = (posY - ray.pos.y) / (-tan(rtheta)) + posX;
+		offset.y = size, offset.x = offset.y / tan(rtheta);
 	}
-	if (raytheta == 0 || raytheta == PI)
+	if (rtheta == 0 || rtheta == PI)
 		ray.pos.x = posX, ray.pos.y = posY, dof = 0;
 	while (dof < 55)
 	{
 		map.x = (int)ray.pos.x >> 4, map.y = (int)ray.pos.y >> 4;
-		if (0 <= map.x && map.x < dimensions.x && 0 <= map.y && map.y < dimensions.y && grid[map.x][map.y].state == 1)
+		if (0 <= map.x && map.x < dim.x && 0 <= map.y && map.y < dim.y && grid[map.x][map.y].state == 1)
 		{
-			length = distance(posX, posY, ray.pos.x, ray.pos.y, raytheta);
+			length = distance(posX, posY, ray.pos.x, ray.pos.y, rtheta);
 			break;
 		}	
 		else
@@ -86,7 +86,7 @@ ray horizontal(float raytheta, int size, coords dimensions, cell **grid)
 	return (out);
 }
 
-ray vertical(float raytheta, int size, coords dimensions, cell **grid)
+ray vertical(float rtheta, int size, coords dim, cell **grid)
 {
 	coordsf offset, vertical = {posX, posY};
 	ray ray, out;
@@ -95,26 +95,26 @@ ray vertical(float raytheta, int size, coords dimensions, cell **grid)
 	float length = 999999999;
 
 	out.val = 0;
-	if (raytheta > (PI / 2) && raytheta < ((3 * PI) / 2))
+	if (rtheta > (PI / 2) && rtheta < ((3 * PI) / 2))
 	{
 		ray.pos.x = (((int)posX >> 4) << 4) - .0001;
-		ray.pos.y = (posX - ray.pos.x) * (-tan(raytheta)) + posY;
-		offset.x = -size, offset.y = offset.x * tan(raytheta);
+		ray.pos.y = (posX - ray.pos.x) * (-tan(rtheta)) + posY;
+		offset.x = -size, offset.y = offset.x * tan(rtheta);
 	}
-	if (raytheta < (PI / 2) || raytheta > ((3 * PI) / 2))
+	if (rtheta < (PI / 2) || rtheta > ((3 * PI) / 2))
 	{
 		ray.pos.x = (((int)posX >> 4) << 4) + size;
-		ray.pos.y = (posX - ray.pos.x) * (-tan(raytheta)) + posY;
-		offset.x = size, offset.y = offset.x * tan(raytheta);
+		ray.pos.y = (posX - ray.pos.x) * (-tan(rtheta)) + posY;
+		offset.x = size, offset.y = offset.x * tan(rtheta);
 	}
-	if (raytheta == 0 || raytheta == PI)
+	if (rtheta == 0 || rtheta == PI)
 		ray.pos.x = posX, ray.pos.y = posY, dof = 0;
 	while (dof < 33)
 	{
 		map.x = (int)ray.pos.x >> 4, map.y = ((int)ray.pos.y >> 4);
-		if (0 <= map.x && map.x < dimensions.x && 0 <= map.y && map.y < dimensions.y && grid[map.x][map.y].state == 1)
+		if (0 <= map.x && map.x < dim.x && 0 <= map.y && map.y < dim.y && grid[map.x][map.y].state == 1)
 		{
-			length = distance(posX, posY, ray.pos.x, ray.pos.y, raytheta);
+			length = distance(posX, posY, ray.pos.x, ray.pos.y, rtheta);
 			vertical.x = ray.pos.x, vertical.x = ray.pos.y;
 			break;
 		}	
@@ -130,14 +130,14 @@ void draw_walls(SDL_instance instance, ray *rays, int size, int thickness, coord
 {
 	int i, j, x, y, flip = 0, linediv, wallx;
 	float line, distance, lens, shade, brightness, fogval;
-	rgba fog = {216, 217, 218, 0}, **texture = init_wall("wall.png");
+	rgba fog = {216, 217, 218, 0}, **texture = init_wall("bricks.png");
 
-	for (int i = 0; i < 1280; i++)
+	for (int i = 0; i < 1260; i++)
 	{
 		lens = theta - rays[i].theta;
 		if (lens < 0) lens += 2 * PI;
 		if (lens > 2 * PI) lens -= 2 * PI;
-		distance = (rays[i].val * 32) * cos(lens);
+		distance = (rays[i].val * 20) * cos(lens);
 		line = (size * 720) / distance;
 		if (line > 720) line = 720;
 		x = i, y = (resolution.y - line * 32) / 2;
@@ -161,20 +161,22 @@ void draw_walls(SDL_instance instance, ray *rays, int size, int thickness, coord
 	}
 }
 
-void draw_sprite(SDL_instance map , SDL_instance display)
+void draw_sprite(SDL_instance map , SDL_instance display, ray *rays)
 {
-	SDL_Rect point;
-	sprite test = {0, {13 * 16, 5 * 16}, 10};
+	SDL_Rect point, mappoint = {13 * 16, 5 * 16, 16, 16};
+	sprite test = {0, {13 * 16, 5 * 16}, 0};
 	coordsf temp = {test.pos.x - posX, test.pos.y - posY};
 	coordsf result = {(temp.y * cos(theta)) - (temp.x * sin(theta)), (temp.x * cos(theta)) + (temp.y * sin(theta))};
 
 	test.pos.x = result.x, test.pos.y = result.y;
-	point.x = (result.x * 1152 / result.y) + (1280 / 2);
-	point.y = (test.z * 1152 / result.y) + (720 / 2);
+	point.x = (result.x * 1260 / result.y) + (1260 / 2);
+	point.y = (test.z * 1260 / result.y) + (720 / 2);
 	point.w = 16, point.h = 16;
 	SDL_SetRenderDrawColor(display.renderer, 255, 240, 0, 0);
-	SDL_RenderFillRect(display.renderer, &point);
-	printf("%f; %f - %f; %f - %f\n", theta, posX, posY, test.pos.x, test.pos.y);
+	SDL_SetRenderDrawColor(map.renderer, 255, 240, 0, 0);
+	SDL_RenderFillRect(map.renderer, &mappoint);
+	if (point.x > 0 && point.x < 1260 && result.y < rays[point.x].val)
+		SDL_RenderFillRect(display.renderer, &point);
 }
 
 void poll_controls(cell **grid)
