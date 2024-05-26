@@ -8,13 +8,6 @@ typedef struct SDL_instance
     SDL_Renderer *renderer;
 } SDL_instance;
 
-typedef struct cell
-{
-    int x, y;
-    int size;
-    int state;
-} cell;
-
 typedef struct coords
 {
 	int x, y;
@@ -24,6 +17,13 @@ typedef struct coordsf
 {
 	float x, y;
 } coordsf;
+
+typedef struct cell
+{
+    coords pos;
+    int size;
+    int state;
+} cell;
 
 typedef struct ray
 {
@@ -68,7 +68,7 @@ frontier *add(frontier **head, coords new);
 frontier *get(frontier *head, int index);
 int delete(frontier **head, unsigned int index);
 int listlen(const frontier *h);
-rgba **init_wall(char *file);
+rgba **init_texture(char *file, int type);
 void patch(cell **grid, coords size, coords pos);
 rgba **init_sprite(char *file);
 void draw_sprite(SDL_instance map , SDL_instance display, ray *rays);

@@ -20,8 +20,8 @@ cell **init_grid(coords res, int cellSize)
 			exit(99);
 		for (int j = 0; j < dim.y; j++)
 		{
-			grid[i][j].x = i;
-			grid[i][j].y = j;
+			grid[i][j].pos.x = i;
+			grid[i][j].pos.y = j;
 			grid[i][j].size = cellSize;
 			grid[i][j].state = 1;			
 		}
@@ -101,7 +101,7 @@ int instantiate(SDL_instance *instance, coords dimensions, char *name, coords po
     return (0);
 }
 
-rgba **init_wall(char *file)
+rgba **init_texture(char *file, int type)
 {
 	int i, j = 0;
 	png_image image;
@@ -137,35 +137,4 @@ void free_grid(cell **grid, int rows)
 	for (int i = 0; i < rows; i++)
 		free(grid[i]);
 	free(grid);
-}
-
-rgba **init_sprite(char *file)
-{
-	int i, j = 0;
-	png_image image;
-	png_bytep buffer;
-
-	rgba **texture = malloc(32 * sizeof(rgba *));
-	memset(&image, 0, sizeof image);
-	image.version = PNG_IMAGE_VERSION;
-	if (png_image_begin_read_from_file(&image, file) != 0)
-	{
-		image.format = PNG_FORMAT_RGBA;
-		buffer = malloc(PNG_IMAGE_SIZE(image));
-		if (buffer && png_image_finish_read(&image, NULL, buffer, 0, NULL) != 0)
-		{
-			for (i = 0; i < 32; i++)
-			{
-				texture[i] = malloc(32 * sizeof(rgba));
-				for (j = 0; j < 32; j++)
-				{
-					texture[i][j].r = buffer[(i + (j * 32)) * 4];
-					texture[i][j].g = buffer[(i + (j * 32)) * 4 + 1];
-					texture[i][j].b = buffer[(i + (j * 32)) * 4 + 2];
-					texture[i][j].a = buffer[(i + (j * 32)) * 4 + 3];
-				}
-			}
-		}
-	}
-	return (texture);
 }
