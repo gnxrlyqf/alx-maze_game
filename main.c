@@ -12,18 +12,20 @@ int main(void)
 	coords pos2 = {1000, 100};
 	cell **grid = init_grid(dimensions1, size);
 	ray *rays = malloc(sizeof(ray) * 1260);
+	SDL_Rect floor = {0, 360, 1260, 360};
 	SDL_Rect sky = {0, 0, 1260, 360};
 
 	if (instantiate(&map, dimensions1, "map", pos1) != 0)
 		return (1);
 	if (instantiate(&display, dimensions2, "display", pos2) != 0)
 		return (1);
+	SDL_SetRenderDrawBlendMode(display.renderer, SDL_BLENDMODE_BLEND);
 	while (1)
 	{
-		SDL_SetRenderDrawColor(map.renderer, 255, 255, 255, 255), SDL_SetRenderDrawColor(display.renderer, 0, 153, 0, 0);
+		SDL_SetRenderDrawColor(map.renderer, 255, 255, 255, 255), SDL_SetRenderDrawColor(display.renderer, 216, 217, 218, 0);
 		SDL_RenderClear(map.renderer), SDL_RenderClear(display.renderer);
-		SDL_SetRenderDrawColor(display.renderer, 216, 217, 218, 255);
-		SDL_RenderFillRect(display.renderer, &sky);
+		SDL_SetRenderDrawColor(display.renderer, 0, 153, 0, 255);
+		SDL_RenderFillRect(display.renderer, &floor);
 		draw_player(map, grid);
 		rays = raytracing(map, size, dimensions1, grid, rays);
 		draw_walls(display, rays, size, thickness, dimensions2);

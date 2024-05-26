@@ -1,1 +1,1 @@
-gcc main.c main.h player.c func.c maze.c `sdl2-config --cflags --libs` -o test -lm -lpng
+gcc main.c main.h engine.c func.c maze.c util.c -o test -lSDL2 -lm -lpng

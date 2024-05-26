@@ -155,7 +155,7 @@ void draw_walls(SDL_instance instance, ray *rays, int size, int thickness, coord
 {
 	int i, j, x, y, flip = 0, linediv, wallx;
 	float line, distance, lens, shade, brightness, fogval;
-	rgba fog = {216, 217, 218, 0}, **texture = init_texture("bricks.png", 1);
+	rgba fog = {216, 217, 218, 0}, **texture = init_texture("bricks.png", 0);
 
 	for (int i = 0; i < 1260; i++)
 	{
@@ -185,7 +185,7 @@ void draw_walls(SDL_instance instance, ray *rays, int size, int thickness, coord
 				(texture[wallx][j].r * shade) * (1 - fogval) + (fogval * fog.r),
 				(texture[wallx][j].g * shade) * (1 - fogval) + (fogval * fog.g),
 				(texture[wallx][j].b * shade) * (1 - fogval) + (fogval * fog.b),
-				(texture[wallx][j].a * shade) * (1 - fogval) + (fogval * fog.a)
+				255
 			);
 			SDL_RenderFillRect(instance.renderer, &wall);
 		}
@@ -195,24 +195,50 @@ void draw_walls(SDL_instance instance, ray *rays, int size, int thickness, coord
 void draw_sprite(SDL_instance map , SDL_instance display, ray *rays)
 {
 	float scale;
-	SDL_Rect point, mappoint = {15 * 16, 4 * 16, 16, 16};
-	sprite test = {0, {15 * 16 + 8, 4 * 16 + 8}, -1};
+	int i, j;
+	SDL_Rect draw = {0, 0, 0, 0}, mappoint = {15 * 16, 5 * 16, 16, 16};
+	sprite test = {0, {15 * 16 + 8, 5 * 16 + 8}, -1};
 	/* Calculate sprite to player vector */
 	coordsf temp = {test.pos.x - posX, test.pos.y - posY};
 	coordsf result = {(temp.y * cos(theta)) - (temp.x * sin(theta)), (temp.x * cos(theta)) + (temp.y * sin(theta))};
+	coords index;
+	rgba **texture = init_texture("skull007.png", 1);
+	SDL_Surface *skull = SDL_LoadBMP("skull007.bmp");
+	SDL_Texture *image = SDL_CreateTextureFromSurface(display.renderer, skull);
 
-	scale = 32 * 360 / result.y;
+	scale = 360 / result.y;
 	test.pos.x = result.x, test.pos.y = result.y;
 	/* Calculate sprite screen positions */
-	point.x = (result.x * 1260 / result.y) + (1260 / 2);
-	point.y = (test.z * 1260 / result.y) + (720 / 2);
-	point.w = point.h = scale;
-	SDL_SetRenderDrawColor(display.renderer, 255, 240, 0, 0);
+	draw.x = (result.x * 1260 / result.y) + (1260 / 2) - (16 * scale);
+	draw.y = (test.z * 1260 / result.y) + (720 / 2);
+	draw.w = scale * 32;
+	draw.h = scale * 32;
 	SDL_SetRenderDrawColor(map.renderer, 255, 240, 0, 0);
+	SDL_SetRenderDrawColor(display.renderer, 255, 255, 255, 0);
 	SDL_RenderFillRect(map.renderer, &mappoint);
+	SDL_RenderCopy(display.renderer, image, NULL, &draw);
+	SDL_RenderDrawRect(display.renderer, &draw);
+
+	// for (j = 0; j < 32; j++)
+	// {
+	// 	draw.x = point.x;
+	// 	index.y = j;
+	// 	for (i = 0; i < 32; i++)
+	// 	{
+	// 		index.x = i;
+	// 		SDL_SetRenderDrawColor(display.renderer,
+	// 			texture[index.x][index.y].r,
+	// 			texture[index.x][index.y].g,
+	// 			texture[index.x][index.y].b,
+	// 			texture[index.x][index.y].a
+	// 		);
+	// 		if (!(texture[index.x][index.y].r == 255 && texture[index.x][index.y].r == 255 && texture[index.x][index.y].g == 0))
+	// 			SDL_RenderDrawPoint(display.renderer, draw.x, point.y + j);
+	// 		draw.x += 1;
+	// 	}
+	// }
 	/* Draw sprite, only if it's in front of a wall */
 	// if (point.x > 0 && point.x < 1260 && result.y < rays[point.x].val)
-		SDL_RenderFillRect(display.renderer, &point);
 }
 
 void poll_controls(cell **grid)
