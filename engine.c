@@ -155,7 +155,7 @@ void draw_walls(SDL_instance instance, ray *rays, int size, int thickness, coord
 {
 	int i, j, x, y, flip = 0, linediv, wallx;
 	float line, distance, lens, shade, brightness, fogval;
-	rgba fog = {216, 217, 218, 0}, **texture = init_texture("bricks.png", 0);
+	rgba fog = {216, 217, 218, 0}, **texture = init_texture("bricks.png", 1);
 
 	for (int i = 0; i < 1260; i++)
 	{
