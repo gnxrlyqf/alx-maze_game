@@ -6,8 +6,9 @@ void maze(cell **grid, coords first, coords range)
 	int i, index;
 	coords focal, offset[4] = {{2, 0}, {-2, 0}, {0, 2}, {0, -2}}, chosen;
 	frontier *head = malloc(sizeof(frontier)), *current;
+
 	head->cell = first, head->next = NULL, head->prev = NULL;
-	while(head)
+	while (head)
 	{
 		srand(time(NULL));
 		index = rand() % listlen(head);
@@ -15,7 +16,9 @@ void maze(cell **grid, coords first, coords range)
 		for (i = 0; i < 4; i++)
 		{
 			focal.x = chosen.x + offset[i].x, focal.y = chosen.y + offset[i].y;
-			if (focal.x >= 0 && focal.y >= 5 && focal.x < range.x && focal.y < range.y - 5 && grid[focal.x][focal.y].state == 1)
+			if (focal.x >= 0 && focal.y >= 5 &&
+				focal.x < range.x && focal.y < range.y - 5 &&
+				grid[focal.x][focal.y].state == 1)
 			{
 				grid[focal.x][focal.y].state = 0;
 				grid[focal.x - (offset[i].x / 2)][focal.y - (offset[i].y / 2)].state = 0;

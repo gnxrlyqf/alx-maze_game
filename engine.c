@@ -10,14 +10,15 @@ float rtheta;
 
 void draw_player(SDL_instance instance, cell **grid)
 {
+	SDL_Rect player = {posX - 4, posY - 4, 8, 8};
+
 	poll_controls(grid);
 	SDL_SetRenderDrawColor(instance.renderer, 255, 0, 0, 255);
-	SDL_Rect player = {posX - 4, posY - 4, 8, 8};
 	SDL_RenderFillRect(instance.renderer, &player);
 }
 
-ray *raytracing(SDL_instance instance, int size, coords dim, cell **grid, ray *rays)
-{
+ray *raycasting(SDL_Renderer *renderer, int size, coords dim, cell **grid,
+ray *rays) {
 	/* Convert world coordinates to grid coordinates */
 	dim.x = dim.x / size;
 	dim.y = dim.y / size;
@@ -33,10 +34,16 @@ ray *raytracing(SDL_instance instance, int size, coords dim, cell **grid, ray *r
 		hor = horizontal(rtheta, size, dim, grid);
 		/* Compare vertical and horizontal lengths, pick the shorter one*/
 		if (hor.val < ver.val)
-			rays[i].pos.x = hor.pos.x, rays[i].pos.y = hor.pos.y, rays[i].val = hor.val, rays[i].theta = rtheta, rays[i].dir = 1;
+		{
+			rays[i].pos.x = hor.pos.x, rays[i].pos.y = hor.pos.y;
+			rays[i].val = hor.val, rays[i].theta = rtheta, rays[i].dir = 1;
+		}
 		if (ver.val < hor.val)
-			rays[i].pos.x = ver.pos.x, rays[i].pos.y = ver.pos.y, rays[i].val = ver.val, rays[i].theta = rtheta, rays[i].dir = 0;
-		SDL_RenderDrawLine(instance.renderer, posX, posY, rays[i].pos.x, rays[i].pos.y);
+		{
+			rays[i].pos.x = ver.pos.x, rays[i].pos.y = ver.pos.y;
+			rays[i].val = ver.val, rays[i].theta = rtheta, rays[i].dir = 0;
+		}
+		SDL_RenderDrawLine(renderer, posX, posY, rays[i].pos.x, rays[i].pos.y);
 		/* Increment ray angle */
 		rtheta += DEG / 21;
 		/* Normalize ray angle */
@@ -48,9 +55,9 @@ ray *raytracing(SDL_instance instance, int size, coords dim, cell **grid, ray *r
 	return (rays);
 }
 
-float distance(float ax ,float ay, float bx, float by, float theta)
+float distance(float ax, float ay, float bx, float by, float theta)
 {
-	return(sqrt(pow(bx - ax, 2) + pow(by - ay, 2)));
+	return (sqrt(pow(bx - ax, 2) + pow(by - ay, 2)));
 }
 
 ray horizontal(float rtheta, int size, coords dim, cell **grid)
@@ -88,11 +95,12 @@ ray horizontal(float rtheta, int size, coords dim, cell **grid)
 		 * Wall - record length and exit loop
 		 * No wall - add offset and reiterate
 		*/
-		if (0 <= map.x && map.x < dim.x && 0 <= map.y && map.y < dim.y && grid[map.x][map.y].state == 1)
-		{
+		if (map.x >= 0 && map.x < dim.x &&
+			map.y >= 0 && map.y < dim.y &&
+			grid[map.x][map.y].state == 1) {
 			length = distance(posX, posY, ray.pos.x, ray.pos.y, rtheta);
 			break;
-		}	
+		}
 		else
 			ray.pos.x += offset.x, ray.pos.y += offset.y;
 		dof += 1;
@@ -132,8 +140,9 @@ ray vertical(float rtheta, int size, coords dim, cell **grid)
 	{
 		/* Convert ray world position to grid position */
 		map.x = (int)ray.pos.x >> 4, map.y = ((int)ray.pos.y >> 4);
-		if (0 <= map.x && map.x < dim.x && 0 <= map.y && map.y < dim.y && grid[map.x][map.y].state == 1)
-		{
+		if (map.x >= 0 && map.x < dim.x &&
+			map.y >= 0 && map.y < dim.y &&
+			grid[map.x][map.y].state == 1) {
 			/**
 			 * Check cell state, if:
 			 * Wall - record length and exit loop
@@ -141,7 +150,7 @@ ray vertical(float rtheta, int size, coords dim, cell **grid)
 			*/
 			length = distance(posX, posY, ray.pos.x, ray.pos.y, rtheta);
 			break;
-		}	
+		}
 		else
 			ray.pos.x += offset.x, ray.pos.y += offset.y;
 		dof += 1;
@@ -151,100 +160,69 @@ ray vertical(float rtheta, int size, coords dim, cell **grid)
 	return (out);
 }
 
-void draw_walls(SDL_instance instance, ray *rays, int size, int thickness, coords resolution)
+column *process_rays(SDL_instance instance, ray *rays, int size, coords res, column *walls)
 {
-	int i, j, x, y, flip = 0, linediv, wallx;
-	float line, distance, lens, shade, brightness, fogval;
+	int i, j;
+	float line, distance, lens, brightness;
 	rgba fog = {216, 217, 218, 0}, **texture = init_texture("bricks.png", 0);
 
 	for (int i = 0; i < 1260; i++)
 	{
 		/* Fix fisheye distortion */
 		lens = theta - rays[i].theta;
-		if (lens < 0) lens += 2 * PI;
-		if (lens > 2 * PI) lens -= 2 * PI;
+		if (lens < 0)
+			lens += 2 * PI;
+		if (lens > 2 * PI)
+			lens -= 2 * PI;
 		distance = (rays[i].val * 20) * cos(lens);
 		/* Calculate column height*/
-		line = (size * 720) / distance;
-		if (line > 720) line = 720;
-		/* Calculate column screen positions */
-		x = i, y = (resolution.y - line * 32) / 2;
+		walls[i].line = (size * 720) / distance;
+		if (walls[i].line > 720)
+			walls[i].line = 720;
 		/* Calculate wall texture x index */
-		wallx = rays[i].dir == 1 ? (int)(rays[i].pos.x * 2) % 32 : 31 - (int)(rays[i].pos.y * 2) % 32;
+		if (rays[i].dir == 1)
+			walls[i].x = (int)(rays[i].pos.x * 2) % 32;
+		if (rays[i].dir == 0)
+			walls[i].x = 31 - (int)(rays[i].pos.y * 2) % 32;
 		/* Calculate brightness and shade factors */
 		brightness = 1 - rays[i].val / 720;
-		if (brightness < 0) brightness = 0;
-		shade = (rays[i].dir == 0 ? .8 : 1) * brightness;
-		fogval = rays[i].val / 300;
-		if (fogval > 1) fogval = 1;
-		/* Draw columns */
-		for (j = 0; j < 32; j++)
-		{
-			SDL_Rect wall = {x, y + (line * j), thickness, line + 1};
-			SDL_SetRenderDrawColor(instance.renderer,
-				(texture[wallx][j].r * shade) * (1 - fogval) + (fogval * fog.r),
-				(texture[wallx][j].g * shade) * (1 - fogval) + (fogval * fog.g),
-				(texture[wallx][j].b * shade) * (1 - fogval) + (fogval * fog.b),
-				255
-			);
-			SDL_RenderFillRect(instance.renderer, &wall);
-		}
+		if (brightness < 0)
+			brightness = 0;
+		walls[i].s = (rays[i].dir == 0 ? .8 : 1) * brightness;
+		walls[i].f = rays[i].val / 300;
+		if (walls[i].f > 1)
+			walls[i].f = 1;
 	}
+	return (walls);
 }
 
-void draw_sprite(SDL_instance map , SDL_instance display, ray *rays)
+void draw_sprite(SDL_instance map, SDL_instance display, ray *rays)
 {
 	float scale;
-	int i, j;
-	SDL_Rect draw = {0, 0, 0, 0}, mappoint = {15 * 16, 5 * 16, 16, 16};
-	sprite test = {0, {15 * 16 + 8, 5 * 16 + 8}, -1};
-	/* Calculate sprite to player vector */
-	coordsf temp = {test.pos.x - posX, test.pos.y - posY};
-	coordsf result = {(temp.y * cos(theta)) - (temp.x * sin(theta)), (temp.x * cos(theta)) + (temp.y * sin(theta))};
-	coords index;
-	rgba **texture = init_texture("skull007.png", 1);
-	SDL_Surface *skull = SDL_LoadBMP("skull007.bmp");
-	SDL_Texture *image = SDL_CreateTextureFromSurface(display.renderer, skull);
+	sprite skull = {0, {15 * 16 + 8, 5 * 16 + 8}, -1};
+	SDL_Rect draw = {0, 0, 0, 0};
+	coordsf temp = {skull.pos.x - posX, skull.pos.y - posY};
+	coordsf result = {(temp.y * cos(theta)) - (temp.x * sin(theta)),
+		(temp.x * cos(theta)) + (temp.y * sin(theta))};
+	SDL_Surface *surface = SDL_LoadBMP("skull007.bmp");
+	SDL_Texture *texture;
 
 	scale = 360 / result.y;
-	test.pos.x = result.x, test.pos.y = result.y;
-	/* Calculate sprite screen positions */
+	skull.pos.x = result.x, skull.pos.y = result.y;
 	draw.x = (result.x * 1260 / result.y) + (1260 / 2) - (16 * scale);
-	draw.y = (test.z * 1260 / result.y) + (720 / 2);
-	draw.w = scale * 32;
-	draw.h = scale * 32;
-	SDL_SetRenderDrawColor(map.renderer, 255, 240, 0, 0);
-	SDL_SetRenderDrawColor(display.renderer, 255, 255, 255, 0);
-	SDL_RenderFillRect(map.renderer, &mappoint);
-	SDL_RenderCopy(display.renderer, image, NULL, &draw);
-	SDL_RenderDrawRect(display.renderer, &draw);
+	draw.y = (skull.z * 1260 / result.y) + (720 / 2);
+	draw.w = draw.h = scale * 32;
 
-	// for (j = 0; j < 32; j++)
-	// {
-	// 	draw.x = point.x;
-	// 	index.y = j;
-	// 	for (i = 0; i < 32; i++)
-	// 	{
-	// 		index.x = i;
-	// 		SDL_SetRenderDrawColor(display.renderer,
-	// 			texture[index.x][index.y].r,
-	// 			texture[index.x][index.y].g,
-	// 			texture[index.x][index.y].b,
-	// 			texture[index.x][index.y].a
-	// 		);
-	// 		if (!(texture[index.x][index.y].r == 255 && texture[index.x][index.y].r == 255 && texture[index.x][index.y].g == 0))
-	// 			SDL_RenderDrawPoint(display.renderer, draw.x, point.y + j);
-	// 		draw.x += 1;
-	// 	}
-	// }
-	/* Draw sprite, only if it's in front of a wall */
-	// if (point.x > 0 && point.x < 1260 && result.y < rays[point.x].val)
+	texture = SDL_CreateTextureFromSurface(display.renderer, surface);
+	SDL_SetRenderDrawColor(display.renderer, 255, 255, 255, 0);
+	SDL_RenderCopy(display.renderer, texture, NULL, &draw);
+	SDL_RenderDrawRect(display.renderer, &draw);
 }
 
 void poll_controls(cell **grid)
 {
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-	
+
 	strafe = theta - 90 * DEG;
 	/* rotate player and calculate offset */
 	if (keystate[SDL_SCANCODE_LEFT])
@@ -261,29 +239,29 @@ void poll_controls(cell **grid)
 	if (keystate[SDL_SCANCODE_W])
 	{
 		if (grid[(int)((posX + dx * 2) / 16)][(int)(posY / 16)].state != 1)
-			posX += dx;
+			posX += dx * .8;
 		if (grid[(int)(posX / 16)][(int)((posY + dy * 2) / 16)].state != 1)
-			posY += dy;
+			posY += dy * .8;
 	}
 	if (keystate[SDL_SCANCODE_S])
 	{
 		if (grid[(int)((posX - dx * 2) / 16)][(int)(posY / 16)].state != 1)
-			posX -= dx;
+			posX -= dx * .8;
 		if (grid[(int)(posX / 16)][(int)((posY - dy * 2) / 16)].state != 1)
-			posY -= dy;
+			posY -= dy * .8;
 	}
 	if (keystate[SDL_SCANCODE_A])
 	{
-		if (grid[(int)((posX += cos(strafe) / 4) / 16)][(int)(posY / 16)].state != 1)
-			posX += cos(strafe) / 4;
-		if (grid[(int)(posX / 16)][(int)((posY += sin(strafe) / 4) / 16)].state != 1)
-			posY += sin(strafe) / 4;		
+		if (grid[(int)((posX + cos(strafe)) / 16)][(int)(posY / 16)].state != 1)
+			posX += cos(strafe) * .8;
+		if (grid[(int)(posX / 16)][(int)((posY + sin(strafe)) / 16)].state != 1)
+			posY += sin(strafe) * .8;
 	}
 	if (keystate[SDL_SCANCODE_D])
 	{
-		if (grid[(int)((posX -= cos(strafe) / 4) / 16)][(int)(posY / 16)].state != 1)
-			posX -= cos(strafe) / 4;
-		if (grid[(int)(posX / 16)][(int)((posY -= sin(strafe) / 4) / 16)].state != 1)
-			posY -= sin(strafe) / 4;		
+		if (grid[(int)((posX - cos(strafe)) / 16)][(int)(posY / 16)].state != 1)
+			posX -= cos(strafe) * .8;
+		if (grid[(int)(posX / 16)][(int)((posY - sin(strafe)) / 16)].state != 1)
+			posY -= sin(strafe) * .8;
 	}
 }

@@ -44,11 +44,19 @@ typedef struct rgba
 
 typedef struct sprite
 {
-	int hostility;
+	int behavior;
 	coordsf pos;
 	float z, theta;
 	rgba **texture;
 } sprite;
+
+typedef struct column
+{
+	coords pos;
+	float line, s, f, dist;
+	int x;
+	char *texture;
+} column;
 
 int instantiate(SDL_instance *instance, coords dimensions, char *name, coords pos);
 void draw_grid(SDL_instance instance, cell **grid, coords dimensions, int cellSize);
@@ -57,12 +65,13 @@ int events(cell **grid, int size);
 void free_grid(cell **grid, int rows);
 void draw_player(SDL_instance instance, cell **grid);
 void poll_controls(cell **grid);
-ray *raytracing(SDL_instance instance, int size, coords dimensions, cell **grid, ray *rays);
+ray *raycasting(SDL_Renderer *renderer, int size, coords dimensions, cell **grid, ray *rays);
 float distance(float ax ,float ay, float bx, float by, float tau);
 ray horizontal(float raytau, int size, coords dim, cell **grid);
 ray vertical(float raytau, int size, coords dim, cell **grid);
 int ftoi(float x);
-void draw_walls(SDL_instance instance, ray *rays, int size, int thickness, coords resolution);
+column *process_rays(SDL_instance instance, ray *rays, int size, coords res, column *walls);
+void render(SDL_Renderer *renderer, column *walls, coords res);
 void maze(cell **grid, coords first, coords range);
 frontier *add(frontier **head, coords new);
 frontier *get(frontier *head, int index);
@@ -70,7 +79,6 @@ int delete(frontier **head, unsigned int index);
 int listlen(const frontier *h);
 rgba **init_texture(char *file, int type);
 void patch(cell **grid, coords size, coords pos);
-rgba **init_sprite(char *file);
 void draw_sprite(SDL_instance map , SDL_instance display, ray *rays);
 
 #endif

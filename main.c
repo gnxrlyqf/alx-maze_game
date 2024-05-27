@@ -12,8 +12,10 @@ int main(void)
 	coords pos2 = {1000, 100};
 	cell **grid = init_grid(dimensions1, size);
 	ray *rays = malloc(sizeof(ray) * 1260);
+	// SDL_Rect **walls = malloc()
 	SDL_Rect floor = {0, 360, 1260, 360};
 	SDL_Rect sky = {0, 0, 1260, 360};
+	column *walls = malloc(sizeof(column) * 1260);
 
 	if (instantiate(&map, dimensions1, "map", pos1) != 0)
 		return (1);
@@ -27,8 +29,9 @@ int main(void)
 		SDL_SetRenderDrawColor(display.renderer, 0, 153, 0, 255);
 		SDL_RenderFillRect(display.renderer, &floor);
 		draw_player(map, grid);
-		rays = raytracing(map, size, dimensions1, grid, rays);
-		draw_walls(display, rays, size, thickness, dimensions2);
+		rays = raycasting(map.renderer, size, dimensions1, grid, rays);
+		walls = process_rays(display, rays, size, dimensions2, walls);
+		render(display.renderer, walls, dimensions2);
 		draw_sprite(map, display, rays);
         draw_grid(map, grid, dimensions1, size);
         if (events(grid, size) == 1)
