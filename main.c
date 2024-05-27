@@ -15,8 +15,12 @@ int main(void)
 	// SDL_Rect **walls = malloc()
 	SDL_Rect floor = {0, 360, 1260, 360};
 	SDL_Rect sky = {0, 0, 1260, 360};
+	entity *entities = malloc(sizeof(entity) * 2);
 	column *walls = malloc(sizeof(column) * 1260);
+	sprite *sprites = malloc(sizeof(sprite) * 2);
 
+	entities[0].pos.x = 15 * 16 + 8, entities[1].pos.x = 17 * 16 + 8;
+	entities[0].pos.y = 5 * 16 + 8, entities[1].pos.y = 2 * 16 + 8;
 	if (instantiate(&map, dimensions1, "map", pos1) != 0)
 		return (1);
 	if (instantiate(&display, dimensions2, "display", pos2) != 0)
@@ -31,8 +35,8 @@ int main(void)
 		draw_player(map, grid);
 		rays = raycasting(map.renderer, size, dimensions1, grid, rays);
 		walls = process_rays(display, rays, size, dimensions2, walls);
-		render(display.renderer, walls, dimensions2);
-		draw_sprite(map, display, rays);
+		sprites = process_sprites(display.renderer, rays, entities, sprites);
+		render(display.renderer, walls, sprites, dimensions2);
         draw_grid(map, grid, dimensions1, size);
         if (events(grid, size) == 1)
             break;

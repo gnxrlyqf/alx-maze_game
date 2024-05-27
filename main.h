@@ -42,12 +42,18 @@ typedef struct rgba
 	int r, g, b, a;
 } rgba;
 
-typedef struct sprite
+typedef struct entity
 {
 	int behavior;
 	coordsf pos;
 	float z, theta;
-	rgba **texture;
+} entity;
+
+typedef struct sprite
+{
+	SDL_Rect rect;
+	SDL_Texture *texture;
+	float dist;
 } sprite;
 
 typedef struct column
@@ -71,7 +77,7 @@ ray horizontal(float raytau, int size, coords dim, cell **grid);
 ray vertical(float raytau, int size, coords dim, cell **grid);
 int ftoi(float x);
 column *process_rays(SDL_instance instance, ray *rays, int size, coords res, column *walls);
-void render(SDL_Renderer *renderer, column *walls, coords res);
+void render(SDL_Renderer *renderer, column *walls, sprite *sprites, coords res);
 void maze(cell **grid, coords first, coords range);
 frontier *add(frontier **head, coords new);
 frontier *get(frontier *head, int index);
@@ -79,6 +85,6 @@ int delete(frontier **head, unsigned int index);
 int listlen(const frontier *h);
 rgba **init_texture(char *file, int type);
 void patch(cell **grid, coords size, coords pos);
-void draw_sprite(SDL_instance map , SDL_instance display, ray *rays);
+sprite *process_sprites(SDL_Renderer *renderer, ray *rays, entity *entities, sprite *sprites);
 
 #endif

@@ -196,27 +196,31 @@ column *process_rays(SDL_instance instance, ray *rays, int size, coords res, col
 	return (walls);
 }
 
-void draw_sprite(SDL_instance map, SDL_instance display, ray *rays)
+sprite *process_sprites(SDL_Renderer *renderer, ray *rays, entity *entities, sprite *sprites)
 {
+	int i, size = sizeof(entities) / sizeof(entity);
 	float scale;
-	sprite skull = {0, {15 * 16 + 8, 5 * 16 + 8}, -1};
-	SDL_Rect draw = {0, 0, 0, 0};
-	coordsf temp = {skull.pos.x - posX, skull.pos.y - posY};
-	coordsf result = {(temp.y * cos(theta)) - (temp.x * sin(theta)),
-		(temp.x * cos(theta)) + (temp.y * sin(theta))};
-	SDL_Surface *surface = SDL_LoadBMP("skull007.bmp");
+	entity curr;
+	SDL_Rect draw;
 	SDL_Texture *texture;
+	coordsf temp, result;
 
-	scale = 360 / result.y;
-	skull.pos.x = result.x, skull.pos.y = result.y;
-	draw.x = (result.x * 1260 / result.y) + (1260 / 2) - (16 * scale);
-	draw.y = (skull.z * 1260 / result.y) + (720 / 2);
-	draw.w = draw.h = scale * 32;
-
-	texture = SDL_CreateTextureFromSurface(display.renderer, surface);
-	SDL_SetRenderDrawColor(display.renderer, 255, 255, 255, 0);
-	SDL_RenderCopy(display.renderer, texture, NULL, &draw);
-	SDL_RenderDrawRect(display.renderer, &draw);
+	for (i = 0; i < 2; i++)
+	{
+		curr = entities[i];
+		temp.x = curr.pos.x - posX;
+		temp.y = curr.pos.y - posY;
+		result.x = (temp.y * cos(theta)) - (temp.x * sin(theta));
+		result.y = (temp.x * cos(theta)) + (temp.y * sin(theta));
+		scale = 360 / result.y;
+		curr.pos.x = result.x, curr.pos.y = result.y;
+		draw.x = (result.x * 1260 / result.y) + (1260 / 2) - (16 * scale);
+		draw.y = (curr.z * 1260 / result.y) + (720 / 2);
+		draw.w = draw.h = scale * 32;
+		sprites[i].rect = draw;
+		sprites[i].texture =  SDL_CreateTextureFromSurface(renderer, SDL_LoadBMP("skull007.bmp"));
+	}
+	return (sprites);
 }
 
 void poll_controls(cell **grid)

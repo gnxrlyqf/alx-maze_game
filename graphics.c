@@ -1,7 +1,7 @@
 #include "main.h"
 #include <SDL2/SDL.h>
 
-void render(SDL_Renderer *renderer, column *walls, coords res)
+void render(SDL_Renderer *renderer, column *walls, sprite *sprites, coords res)
 {
 	int i, j, texturex;
 	SDL_Rect wall;
@@ -24,7 +24,11 @@ void render(SDL_Renderer *renderer, column *walls, coords res)
 			);
 			SDL_RenderFillRect(renderer, &wall);
 		}
-
 	}
-
+	for (i = 0; i < 2; i++)
+	{
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+		SDL_RenderCopy(renderer, sprites[i].texture, NULL, &sprites[i].rect);
+		SDL_RenderDrawRect(renderer, &sprites[i].rect);
+	}
 }
