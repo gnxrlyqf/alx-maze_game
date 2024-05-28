@@ -53,7 +53,7 @@ typedef struct sprite
 {
 	SDL_Rect rect;
 	SDL_Texture *texture;
-	float dist;
+	float dist, scale;
 } sprite;
 
 typedef struct column
@@ -64,6 +64,11 @@ typedef struct column
 	char *texture;
 } column;
 
+typedef enum {
+	SPRITE,
+	COLUMN
+} TYPE;
+
 int instantiate(SDL_instance *instance, coords dimensions, char *name, coords pos);
 void draw_grid(SDL_instance instance, cell **grid, coords dimensions, int cellSize);
 cell **init_grid(coords dimensions, int cellSize);
@@ -72,7 +77,7 @@ void free_grid(cell **grid, int rows);
 void draw_player(SDL_instance instance, cell **grid);
 void poll_controls(cell **grid);
 ray *raycasting(SDL_Renderer *renderer, int size, coords dimensions, cell **grid, ray *rays);
-float distance(float ax ,float ay, float bx, float by, float tau);
+float distance(float ax ,float ay, float bx, float by);
 ray horizontal(float raytau, int size, coords dim, cell **grid);
 ray vertical(float raytau, int size, coords dim, cell **grid);
 int ftoi(float x);
@@ -86,5 +91,14 @@ int listlen(const frontier *h);
 rgba **init_texture(char *file, int type);
 void patch(cell **grid, coords size, coords pos);
 sprite *process_sprites(SDL_Renderer *renderer, ray *rays, entity *entities, sprite *sprites);
+
+void quick_sort_sprite(sprite *arr, int low, int high);
+int partition_sprite(sprite *arr, int low, int high);
+void swap_sprite(sprite* a, sprite* b);
+
+void quick_sort_wall(column *arr, int low, int high);
+int partition_wall(column *arr, int low, int high);
+void swap_wall(column* a, column* b);
+
 
 #endif

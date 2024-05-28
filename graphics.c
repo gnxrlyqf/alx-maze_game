@@ -3,15 +3,17 @@
 
 void render(SDL_Renderer *renderer, column *walls, sprite *sprites, coords res)
 {
-	int i, j, texturex;
+	int i, j, texturex, si = 0, col;
 	SDL_Rect wall;
 	rgba fog = {216, 217, 218, 0}, **texture = init_texture("bricks.png", 0);
 	column curr;
+	sprite scurr;
 
 	for (i = 0; i < 1260; i++)
 	{
-		wall.x = i;
+		wall.x = walls[i].pos.x;
 		curr = walls[i];
+		scurr = sprites[si];
 		for (j = 0; j < 32; j++)
 		{
 			wall.y = ((res.y - curr.line * 32) / 2) + (curr.line * j);
@@ -24,11 +26,11 @@ void render(SDL_Renderer *renderer, column *walls, sprite *sprites, coords res)
 			);
 			SDL_RenderFillRect(renderer, &wall);
 		}
-	}
-	for (i = 0; i < 2; i++)
-	{
-		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
-		SDL_RenderCopy(renderer, sprites[i].texture, NULL, &sprites[i].rect);
-		SDL_RenderDrawRect(renderer, &sprites[i].rect);
+		if (scurr.dist < curr.dist)
+		{
+			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+			SDL_RenderCopy(renderer, sprites[si].texture, NULL, &sprites[si].rect);
+			SDL_RenderDrawRect(renderer, &sprites[si].rect);
+		}
 	}
 }

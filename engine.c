@@ -55,11 +55,6 @@ ray *rays) {
 	return (rays);
 }
 
-float distance(float ax, float ay, float bx, float by, float theta)
-{
-	return (sqrt(pow(bx - ax, 2) + pow(by - ay, 2)));
-}
-
 ray horizontal(float rtheta, int size, coords dim, cell **grid)
 {
 	coordsf offset, horizontal = {posX, posY};
@@ -98,7 +93,7 @@ ray horizontal(float rtheta, int size, coords dim, cell **grid)
 		if (map.x >= 0 && map.x < dim.x &&
 			map.y >= 0 && map.y < dim.y &&
 			grid[map.x][map.y].state == 1) {
-			length = distance(posX, posY, ray.pos.x, ray.pos.y, rtheta);
+			length = distance(posX, posY, ray.pos.x, ray.pos.y);
 			break;
 		}
 		else
@@ -148,7 +143,7 @@ ray vertical(float rtheta, int size, coords dim, cell **grid)
 			 * Wall - record length and exit loop
 			 * No wall - add offset and reiterate
 			*/
-			length = distance(posX, posY, ray.pos.x, ray.pos.y, rtheta);
+			length = distance(posX, posY, ray.pos.x, ray.pos.y);
 			break;
 		}
 		else
@@ -168,6 +163,7 @@ column *process_rays(SDL_instance instance, ray *rays, int size, coords res, col
 
 	for (int i = 0; i < 1260; i++)
 	{
+		walls[i].pos.x = i;
 		/* Fix fisheye distortion */
 		lens = theta - rays[i].theta;
 		if (lens < 0)
@@ -175,6 +171,7 @@ column *process_rays(SDL_instance instance, ray *rays, int size, coords res, col
 		if (lens > 2 * PI)
 			lens -= 2 * PI;
 		distance = (rays[i].val * 20) * cos(lens);
+		walls[i].dist = rays[i].val;
 		/* Calculate column height*/
 		walls[i].line = (size * 720) / distance;
 		if (walls[i].line > 720)
@@ -193,6 +190,7 @@ column *process_rays(SDL_instance instance, ray *rays, int size, coords res, col
 		if (walls[i].f > 1)
 			walls[i].f = 1;
 	}
+	quick_sort_wall(walls, 0, 1259);
 	return (walls);
 }
 
@@ -213,6 +211,8 @@ sprite *process_sprites(SDL_Renderer *renderer, ray *rays, entity *entities, spr
 		result.x = (temp.y * cos(theta)) - (temp.x * sin(theta));
 		result.y = (temp.x * cos(theta)) + (temp.y * sin(theta));
 		scale = 360 / result.y;
+		sprites[i].dist = distance(curr.pos.x, curr.pos.y, posX, posY);
+		sprites[i].scale = scale;
 		curr.pos.x = result.x, curr.pos.y = result.y;
 		draw.x = (result.x * 1260 / result.y) + (1260 / 2) - (16 * scale);
 		draw.y = (curr.z * 1260 / result.y) + (720 / 2);
@@ -220,6 +220,7 @@ sprite *process_sprites(SDL_Renderer *renderer, ray *rays, entity *entities, spr
 		sprites[i].rect = draw;
 		sprites[i].texture =  SDL_CreateTextureFromSurface(renderer, SDL_LoadBMP("skull007.bmp"));
 	}
+	// quick_sort_sprite(sprites, 0, 1);
 	return (sprites);
 }
 
