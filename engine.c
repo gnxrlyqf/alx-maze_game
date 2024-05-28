@@ -4,34 +4,23 @@
 #define PI 3.14159265358979
 #define DEG 0.0174533
 #define RAD 57.2957795
-float theta = PI / 2, dx, dy, strafe;
-float posX = 264, posY = 48;
 float rtheta;
 
-void draw_player(SDL_instance instance, cell **grid)
+ray *raycast(SDL_Renderer *r, int size, coords dim, cell **grid, ray *rays, player p)
 {
-	SDL_Rect player = {posX - 4, posY - 4, 8, 8};
-
-	poll_controls(grid);
-	SDL_SetRenderDrawColor(instance.renderer, 255, 0, 0, 255);
-	SDL_RenderFillRect(instance.renderer, &player);
-}
-
-ray *raycasting(SDL_Renderer *renderer, int size, coords dim, cell **grid,
-ray *rays) {
 	/* Convert world coordinates to grid coordinates */
 	dim.x = dim.x / size;
 	dim.y = dim.y / size;
 	/* Initialize FOV */
-	rtheta = theta - (DEG * 30);
+	rtheta = p.theta - (DEG * 30);
 	int i;
 	ray ray, hor, ver;
 
 	for (int i = 0; i < 1260; i++)
 	{
 		/* Get vertical/horizontal line checks */
-		ver = vertical(rtheta, size, dim, grid);
-		hor = horizontal(rtheta, size, dim, grid);
+		ver = vertical(rtheta, size, dim, grid, p.pos);
+		hor = horizontal(rtheta, size, dim, grid, p.pos);
 		/* Compare vertical and horizontal lengths, pick the shorter one*/
 		if (hor.val < ver.val)
 		{
@@ -43,7 +32,6 @@ ray *rays) {
 			rays[i].pos.x = ver.pos.x, rays[i].pos.y = ver.pos.y;
 			rays[i].val = ver.val, rays[i].theta = rtheta, rays[i].dir = 0;
 		}
-		SDL_RenderDrawLine(renderer, posX, posY, rays[i].pos.x, rays[i].pos.y);
 		/* Increment ray angle */
 		rtheta += DEG / 21;
 		/* Normalize ray angle */
@@ -55,9 +43,9 @@ ray *rays) {
 	return (rays);
 }
 
-ray horizontal(float rtheta, int size, coords dim, cell **grid)
+ray horizontal(float rtheta, int size, coords dim, cell **grid, coordsf pos)
 {
-	coordsf offset, horizontal = {posX, posY};
+	coordsf offset;
 	ray ray, out;
 	coords map;
 	int dof = 0;
@@ -67,19 +55,19 @@ ray horizontal(float rtheta, int size, coords dim, cell **grid)
 	/* Calculate offset */
 	if (rtheta > PI)
 	{
-		ray.pos.y = (((int)posY >> 4) << 4) - .0001;
-		ray.pos.x = (posY - ray.pos.y) / (-tan(rtheta)) + posX;
+		ray.pos.y = (((int)pos.y >> 4) << 4) - .0001;
+		ray.pos.x = (pos.y - ray.pos.y) / (-tan(rtheta)) + pos.x;
 		offset.y = -size, offset.x = offset.y / tan(rtheta);
 	}
 	if (rtheta < PI)
 	{
-		ray.pos.y = (((int)posY >> 4) << 4) + size;
-		ray.pos.x = (posY - ray.pos.y) / (-tan(rtheta)) + posX;
+		ray.pos.y = (((int)pos.y >> 4) << 4) + size;
+		ray.pos.x = (pos.y - ray.pos.y) / (-tan(rtheta)) + pos.x;
 		offset.y = size, offset.x = offset.y / tan(rtheta);
 	}
 	/* Edge case for ray being angled straight right or left */
 	if (rtheta == 0 || rtheta == PI)
-		ray.pos.x = posX, ray.pos.y = posY, dof = 0;
+		ray.pos.x = pos.x, ray.pos.y = pos.y, dof = 0;
 	/* Check for walls */
 	while (dof < 55)
 	{
@@ -93,7 +81,7 @@ ray horizontal(float rtheta, int size, coords dim, cell **grid)
 		if (map.x >= 0 && map.x < dim.x &&
 			map.y >= 0 && map.y < dim.y &&
 			grid[map.x][map.y].state == 1) {
-			length = distance(posX, posY, ray.pos.x, ray.pos.y);
+			length = distance(pos.x, pos.y, ray.pos.x, ray.pos.y);
 			break;
 		}
 		else
@@ -105,9 +93,9 @@ ray horizontal(float rtheta, int size, coords dim, cell **grid)
 	return (out);
 }
 
-ray vertical(float rtheta, int size, coords dim, cell **grid)
+ray vertical(float rtheta, int size, coords dim, cell **grid, coordsf pos)
 {
-	coordsf offset, vertical = {posX, posY};
+	coordsf offset;
 	ray ray, out;
 	coords map;
 	int dof = 0;
@@ -117,19 +105,19 @@ ray vertical(float rtheta, int size, coords dim, cell **grid)
 	/* Calculate offset */
 	if (rtheta > (PI / 2) && rtheta < ((3 * PI) / 2))
 	{
-		ray.pos.x = (((int)posX >> 4) << 4) - .0001;
-		ray.pos.y = (posX - ray.pos.x) * (-tan(rtheta)) + posY;
+		ray.pos.x = (((int)pos.x >> 4) << 4) - .0001;
+		ray.pos.y = (pos.x - ray.pos.x) * (-tan(rtheta)) + pos.y;
 		offset.x = -size, offset.y = offset.x * tan(rtheta);
 	}
 	if (rtheta < (PI / 2) || rtheta > ((3 * PI) / 2))
 	{
-		ray.pos.x = (((int)posX >> 4) << 4) + size;
-		ray.pos.y = (posX - ray.pos.x) * (-tan(rtheta)) + posY;
+		ray.pos.x = (((int)pos.x >> 4) << 4) + size;
+		ray.pos.y = (pos.x - ray.pos.x) * (-tan(rtheta)) + pos.y;
 		offset.x = size, offset.y = offset.x * tan(rtheta);
 	}
 	/* Edge case for ray being angled straight up or down */
 	if (rtheta == PI / 2 || rtheta == 2 * PI / 3)
-		ray.pos.x = posX, ray.pos.y = posY, dof = 0;
+		ray.pos.x = pos.x, ray.pos.y = pos.y, dof = 0;
 	/* Check for walls */
 	while (dof < 33)
 	{
@@ -143,7 +131,7 @@ ray vertical(float rtheta, int size, coords dim, cell **grid)
 			 * Wall - record length and exit loop
 			 * No wall - add offset and reiterate
 			*/
-			length = distance(posX, posY, ray.pos.x, ray.pos.y);
+			length = distance(pos.x, pos.y, ray.pos.x, ray.pos.y);
 			break;
 		}
 		else
@@ -155,11 +143,12 @@ ray vertical(float rtheta, int size, coords dim, cell **grid)
 	return (out);
 }
 
-column *process_rays(SDL_instance instance, ray *rays, int size, coords res, column *walls)
+column *process_rays(ray *rays, int size, float theta)
 {
 	int i, j;
 	float line, distance, lens, brightness;
 	rgba fog = {216, 217, 218, 0}, **texture = init_texture("bricks.png", 0);
+	column *walls = malloc(sizeof(column) * 1260);
 
 	for (int i = 0; i < 1260; i++)
 	{
@@ -194,24 +183,25 @@ column *process_rays(SDL_instance instance, ray *rays, int size, coords res, col
 	return (walls);
 }
 
-sprite *process_sprites(SDL_Renderer *renderer, ray *rays, entity *entities, sprite *sprites)
+sprite *process_sprites(SDL_Renderer *renderer, entity *entities, int size, player p)
 {
-	int i, size = sizeof(entities) / sizeof(entity);
+	int i;
 	float scale;
 	entity curr;
 	SDL_Rect draw;
 	SDL_Texture *texture;
 	coordsf temp, result;
+	sprite *sprites = malloc(sizeof(sprite) * size);
 
 	for (i = 0; i < 2; i++)
 	{
 		curr = entities[i];
-		temp.x = curr.pos.x - posX;
-		temp.y = curr.pos.y - posY;
-		result.x = (temp.y * cos(theta)) - (temp.x * sin(theta));
-		result.y = (temp.x * cos(theta)) + (temp.y * sin(theta));
+		temp.x = curr.pos.x - p.pos.x;
+		temp.y = curr.pos.y - p.pos.y;
+		result.x = (temp.y * cos(p.theta)) - (temp.x * sin(p.theta));
+		result.y = (temp.x * cos(p.theta)) + (temp.y * sin(p.theta));
 		scale = 360 / result.y;
-		sprites[i].dist = distance(curr.pos.x, curr.pos.y, posX, posY);
+		sprites[i].dist = distance(curr.pos.x, curr.pos.y, p.pos.x, p.pos.y);
 		sprites[i].scale = scale;
 		curr.pos.x = result.x, curr.pos.y = result.y;
 		draw.x = (result.x * 1260 / result.y) + (1260 / 2) - (16 * scale);
@@ -222,51 +212,4 @@ sprite *process_sprites(SDL_Renderer *renderer, ray *rays, entity *entities, spr
 	}
 	// quick_sort_sprite(sprites, 0, 1);
 	return (sprites);
-}
-
-void poll_controls(cell **grid)
-{
-	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-
-	strafe = theta - 90 * DEG;
-	/* rotate player and calculate offset */
-	if (keystate[SDL_SCANCODE_LEFT])
-	{
-		theta -= .025;
-		dx = cos(theta), dy = sin(theta);
-	}
-		if (keystate[SDL_SCANCODE_RIGHT])
-	{
-		theta += .025;
-		dx = cos(theta), dy = sin(theta);
-	}
-	/* Check for collisions, move player if none*/
-	if (keystate[SDL_SCANCODE_W])
-	{
-		if (grid[(int)((posX + dx * 2) / 16)][(int)(posY / 16)].state != 1)
-			posX += dx * .8;
-		if (grid[(int)(posX / 16)][(int)((posY + dy * 2) / 16)].state != 1)
-			posY += dy * .8;
-	}
-	if (keystate[SDL_SCANCODE_S])
-	{
-		if (grid[(int)((posX - dx * 2) / 16)][(int)(posY / 16)].state != 1)
-			posX -= dx * .8;
-		if (grid[(int)(posX / 16)][(int)((posY - dy * 2) / 16)].state != 1)
-			posY -= dy * .8;
-	}
-	if (keystate[SDL_SCANCODE_A])
-	{
-		if (grid[(int)((posX + cos(strafe)) / 16)][(int)(posY / 16)].state != 1)
-			posX += cos(strafe) * .8;
-		if (grid[(int)(posX / 16)][(int)((posY + sin(strafe)) / 16)].state != 1)
-			posY += sin(strafe) * .8;
-	}
-	if (keystate[SDL_SCANCODE_D])
-	{
-		if (grid[(int)((posX - cos(strafe)) / 16)][(int)(posY / 16)].state != 1)
-			posX -= cos(strafe) * .8;
-		if (grid[(int)(posX / 16)][(int)((posY - sin(strafe)) / 16)].state != 1)
-			posY -= sin(strafe) * .8;
-	}
 }
