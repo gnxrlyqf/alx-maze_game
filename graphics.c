@@ -1,12 +1,19 @@
 #include "main.h"
 #include <SDL2/SDL.h>
 
-void render(SDL_Renderer *map, SDL_Renderer *display, column *walls, sprite *sprites, coords res)
+/**
+ * render - handles rendering of game elements
+ * @display: renderer on which to draw elements
+ * @walls: array of vertical lines forming walls
+ * @sprites: array of sprites to be drawn
+ * @res: screen resolution
+*/
+void render(SDL_Renderer *display, column *walls, sprite *sprites, coords res)
 {
 	int i, j, texturex, si = 0, col;
 	SDL_Rect wall, floor = {0, 360, 1260, 360}, sky = {0, 0, 1260, 360};
 
-	rgba fog = {216, 217, 218, 0}, **texture = init_texture("bricks.png", 0);
+	rgba fog = {216, 217, 218, 0}, **texture = init_texture("bricks.png");
 	column curr;
 	sprite scurr;
 
@@ -34,39 +41,41 @@ void render(SDL_Renderer *map, SDL_Renderer *display, column *walls, sprite *spr
 		if (scurr.dist < curr.dist)
 		{
 			SDL_SetRenderDrawColor(display, 255, 255, 255, 0);
-			SDL_RenderCopy(display, sprites[si].texture, NULL, &sprites[si].rect);
+			SDL_RenderCopy(display, sprites[si].t, NULL, &sprites[si].rect);
 			SDL_RenderDrawRect(display, &sprites[si].rect);
 		}
 	}
 	SDL_RenderPresent(display);
 }
 
-void draw_player(SDL_Renderer *renderer, cell **grid, coordsf pos)
+/**
+ * draw_map - displays a top down view of the world map
+ * @m: renderer to display on
+ * @g: two dimensional array representing grid
+ * @d: world dimensions
+ * @s: cell size
+ * @p: player position
+ * @r: array of rays
+*/
+void draw_map(SDL_Renderer *m, cell **g, coords d, int s, coordsf p, ray *r)
 {
-	SDL_Rect player = {pos.x - 4, pos.y - 4, 8, 8};
+	int i, j;
+	SDL_Rect player = {p.x - 4, p.y - 4, 8, 8}, cell;
 
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_RenderFillRect(renderer, &player);
-}
-
-void draw_map(SDL_Renderer *renderer, cell **grid, coords dimensions, int cellSize, coordsf pos, ray *rays)
-{
-	int i, j, size = grid[0][0].size;
-	SDL_Rect player = {pos.x - 4, pos.y - 4, 8, 8};
-
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_RenderClear(renderer);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-	for (i = 0; i < dimensions.x / cellSize; i++)
-		for (j = 0; j < dimensions.y / cellSize; j++)
+	SDL_SetRenderDrawColor(m, 255, 255, 255, 255);
+	SDL_RenderClear(m);
+	SDL_SetRenderDrawColor(m, 0, 0, 0, 0);
+	for (i = 0; i < d.x / s; i++)
+		for (j = 0; j < d.y / s; j++)
 		{
-			SDL_Rect cell = {i * size, j * size, size, size};
-			if (grid[i][j].state == 1)
-				SDL_RenderFillRect(renderer, &cell);
+			cell.x = i * s, cell.y = j * s;
+			cell.w = cell.h = s;
+			if (g[i][j].state == 1)
+				SDL_RenderFillRect(m, &cell);
 		}
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_RenderFillRect(renderer, &player);
+	SDL_SetRenderDrawColor(m, 255, 0, 0, 255);
+	SDL_RenderFillRect(m, &player);
 	for (i = 0; i < 1260; i++)
-		SDL_RenderDrawLine(renderer, pos.x, pos.y, rays[i].pos.x, rays[i].pos.y);
-	SDL_RenderPresent(renderer);
+		SDL_RenderDrawLine(m, p.x, p.y, r[i].pos.x, r[i].pos.y);
+	SDL_RenderPresent(m);
 }

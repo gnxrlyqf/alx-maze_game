@@ -1,93 +1,49 @@
 #include "main.h"
 
-float distance(float ax, float ay, float bx, float by)
+/**
+ * distance - calculates distance between two points
+ * @a: point a
+ * @b: point b
+ *
+ * Return: distance between two points
+*/
+float distance(coordsf a, coordsf b)
 {
-	return (sqrt(pow(bx - ax, 2) + pow(by - ay, 2)));
+	return (sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2)));
 }
 
+/**
+ * ftoi - rounds a float into an int
+ * @x: float to round
+ *
+ * Return: rounded int
+*/
 int ftoi(float x)
 {
 	int int_part = (int)x;
 	float decimal_part = x - int_part;
 
 	if (decimal_part >= 0.5)
-		return ceil(x);
+		return (ceil(x));
 	else
-		return floor(x);
+		return (floor(x));
 }
 
-void quick_sort_sprite(sprite *arr, int low, int high) 
-{ 
-	if (low < high)
-	{
-		int partitionIndex = partition_sprite(arr, low, high); 
-		quick_sort_sprite(arr, low, partitionIndex - 1); 
-		quick_sort_sprite(arr, partitionIndex + 1, high); 
-	} 
-}
-
-void quick_sort_wall(column *arr, int low, int high) 
-{ 
-	if (low < high)
-	{
-		int partitionIndex = partition_wall(arr, low, high); 
-		quick_sort_wall(arr, low, partitionIndex - 1); 
-		quick_sort_wall(arr, partitionIndex + 1, high); 
-	} 
-} 
-
-int partition_sprite(sprite *arr, int low, int high) 
+/**
+ * patch - creates empty patch in grid
+ * @grid: two dimensional array representing grid
+ * @size: cell size
+ * @pos: position to put the patch
+*/
+void patch(cell **grid, coords size, coords pos)
 {
-	sprite pivot = arr[low]; 
-	int i = low; 
-	int j = high; 
+	int i, j;
 
-	while (i < j) { 
-		while (arr[i].dist <= pivot.dist && i <= high - 1) { 
-			i++; 
-		} 
-		while (arr[j].dist > pivot.dist && j >= low + 1) { 
-			j--; 
-		} 
-		if (i < j) { 
-			swap_sprite(&arr[i], &arr[j]); 
-		} 
-	} 
-	swap_sprite(&arr[low], &arr[j]); 
-	return j; 
-}
-
-int partition_wall(column *arr, int low, int high) 
-{
-	column pivot = arr[low]; 
-	int i = low; 
-	int j = high; 
-
-	while (i < j) { 
-		while (arr[i].dist >= pivot.dist && i <= high - 1) { 
-			i++; 
-		} 
-		while (arr[j].dist < pivot.dist && j >= low + 1) { 
-			j--; 
-		} 
-		if (i < j) { 
-			swap_wall(&arr[i], &arr[j]); 
-		} 
-	} 
-	swap_wall(&arr[low], &arr[j]); 
-	return j; 
-} 
-
-void swap_sprite(sprite *a, sprite *b) 
-{ 
-	sprite temp = *a; 
-	*a = *b; 
-	*b = temp; 
-}
-
-void swap_wall(column *a, column *b) 
-{ 
-	column temp = *a; 
-	*a = *b; 
-	*b = temp; 
+	for (i = pos.x; i < pos.x + size.x; i++)
+	{
+		for (j = pos.y; j < pos.y + size.y; j++)
+		{
+			grid[i][j].state = 0;
+		}
+	}
 }

@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 
+/**
+ * main - entry point of program
+ *
+ * Return: Always 0
+*/
 int main(void)
 {
 	SDL_instance map, display;
@@ -21,8 +26,8 @@ int main(void)
 	game(grid, map.renderer, display.renderer, dimensions1, dimensions2);
 	free_grid(grid, dimensions1.x / size);
 	free(rays);
-    SDL_DestroyRenderer(map.renderer), SDL_DestroyRenderer(display.renderer);
-    SDL_DestroyWindow(map.window), SDL_DestroyWindow(display.window);
-    SDL_Quit();
+	SDL_DestroyRenderer(map.renderer), SDL_DestroyRenderer(display.renderer);
+	SDL_DestroyWindow(map.window), SDL_DestroyWindow(display.window);
+	SDL_Quit();
 	return (0);
 }

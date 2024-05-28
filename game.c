@@ -3,7 +3,15 @@
 #define DEG 0.0174533
 #define RAD 57.2957795
 
-void game(cell **grid, SDL_Renderer *map, SDL_Renderer *display, coords dim1, coords dim2)
+/**
+ * game - main game loop
+ * @grid: two dimensional array of cells representing grid
+ * @m: map renderer
+ * @d: display renderer
+ * @d1: grid dimensions
+ * @d2: world dimensions
+*/
+void game(cell **grid, SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2)
 {
 	int size = 16, s_count;
 	ray *rays = malloc(sizeof(ray) * 1260);
@@ -17,61 +25,62 @@ void game(cell **grid, SDL_Renderer *map, SDL_Renderer *display, coords dim1, co
 
 	while (1)
 	{
-		poll_controls(grid, &p);
-		rays = raycast(map, size, dim1, grid, rays, p);
+		controls(grid, &p);
+		rays = raycast(size, d1, grid, rays, p);
 		walls = process_rays(rays, size, p.theta);
-		sprites = process_sprites(display, entities, s_count, p);
-		render(map, display, walls, sprites, dim2);
-		draw_map(map, grid, dim1, size, p.pos, rays);
+		sprites = process_sprites(d, entities, s_count, p);
+		render(d, walls, sprites, d2);
+		draw_map(m, grid, d1, size, p.pos, rays);
 		if (events(grid, size) == 1)
 			return;
 	}
-
 }
 
-void poll_controls(cell **grid, player *p)
+/**
+ * controls - handles keyboard polling for player controls
+ * @grid: two dimensional array of cells representing grid
+ * @p: player struct
+*/
+void controls(cell **grid, player *p)
 {
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-
+	coordsf check;
 	float strafe = p->theta - 90 * DEG;
-	/* rotate player and calculate offset */
+
 	if (keystate[SDL_SCANCODE_LEFT])
-	{
-		p->theta -= .025;
-		p->d.x = cos(p->theta), p->d.y = sin(p->theta);
-	}
-		if (keystate[SDL_SCANCODE_RIGHT])
-	{
-		p->theta += .025;
-		p->d.x = cos(p->theta), p->d.y = sin(p->theta);
-	}
-	/* Check for collisions, move player if none*/
+		p->theta -= .025, p->d.x = cos(p->theta), p->d.y = sin(p->theta);
+	if (keystate[SDL_SCANCODE_RIGHT])
+		p->theta += .025, p->d.x = cos(p->theta), p->d.y = sin(p->theta);
 	if (keystate[SDL_SCANCODE_W])
 	{
-		if (grid[(int)((p->pos.x + p->d.x * 2) / 16)][(int)(p->pos.y / 16)].state != 1)
+		check.x = p->pos.x + p->d.x * 2, check.y = p->pos.y + p->d.y * 2;
+		if (grid[(int)(check.x / 16)][(int)(p->pos.y / 16)].state != 1)
 			p->pos.x += p->d.x * .8;
-		if (grid[(int)(p->pos.x / 16)][(int)((p->pos.y + p->d.y * 2) / 16)].state != 1)
+		if (grid[(int)(p->pos.x / 16)][(int)(check.y / 16)].state != 1)
 			p->pos.y += p->d.y * .8;
 	}
 	if (keystate[SDL_SCANCODE_S])
 	{
-		if (grid[(int)((p->pos.x - p->d.x * 2) / 16)][(int)(p->pos.y / 16)].state != 1)
+		check.x = p->pos.x - p->d.x * 2, check.y = p->pos.y - p->d.y * 2;
+		if (grid[(int)(check.x / 16)][(int)(p->pos.y / 16)].state != 1)
 			p->pos.x -= p->d.x * .8;
-		if (grid[(int)(p->pos.x / 16)][(int)((p->pos.y - p->d.y * 2) / 16)].state != 1)
+		if (grid[(int)(p->pos.x / 16)][(int)(check.y / 16)].state != 1)
 			p->pos.y -= p->d.y * .8;
 	}
 	if (keystate[SDL_SCANCODE_A])
 	{
-		if (grid[(int)((p->pos.x + cos(strafe)) / 16)][(int)(p->pos.y / 16)].state != 1)
+		check.x = p->pos.x + cos(strafe), check.y = p->pos.y + sin(strafe);
+		if (grid[(int)(check.x / 16)][(int)(p->pos.y / 16)].state != 1)
 			p->pos.x += cos(strafe) * .8;
-		if (grid[(int)(p->pos.x / 16)][(int)((p->pos.y + sin(strafe)) / 16)].state != 1)
+		if (grid[(int)(p->pos.x / 16)][(int)(check.y / 16)].state != 1)
 			p->pos.y += sin(strafe) * .8;
 	}
 	if (keystate[SDL_SCANCODE_D])
 	{
-		if (grid[(int)((p->pos.x - cos(strafe)) / 16)][(int)(p->pos.y / 16)].state != 1)
+		check.x = p->pos.x - cos(strafe), check.y = p->pos.y - sin(strafe);
+		if (grid[(int)(check.x / 16)][(int)(p->pos.y / 16)].state != 1)
 			p->pos.x -= cos(strafe) * .8;
-		if (grid[(int)(p->pos.x / 16)][(int)((p->pos.y - sin(strafe)) / 16)].state != 1)
+		if (grid[(int)(p->pos.x / 16)][(int)(check.y / 16)].state != 1)
 			p->pos.y -= sin(strafe) * .8;
 	}
 }

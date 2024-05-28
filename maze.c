@@ -1,10 +1,17 @@
 #include "main.h"
 #include <time.h>
 
+/**
+ * maze - creates a maze in the grid using Prim's algorithm
+ * @grid: two dimensional array of cells representing grid
+ * @first: starting cell of the algorithm
+ * @range: maximum position to traverse
+*/
 void maze(cell **grid, coords first, coords range)
 {
 	int i, index;
 	coords focal, offset[4] = {{2, 0}, {-2, 0}, {0, 2}, {0, -2}}, chosen;
+	coords size = {7, 4}, posstart = {13, 1}, posend = {13, 50};
 	frontier *head = malloc(sizeof(frontier)), *current;
 
 	head->cell = first, head->next = NULL, head->prev = NULL;
@@ -27,12 +34,18 @@ void maze(cell **grid, coords first, coords range)
 		}
 		delete(&head, index);
 	}
-	coords size = {7, 4}, posstart = {13, 1}, posend = {13, 50};
 	patch(grid, size, posstart);
 	patch(grid, size, posend);
 
 }
 
+/**
+ * add - adds a frontier node to the linked list
+ * @head: double pointer to the head node
+ * @new: data of the node to add
+ *
+ * Return: pointer to the newly added node
+*/
 frontier *add(frontier **head, coords new)
 {
 	frontier *node, *last;
@@ -56,6 +69,13 @@ frontier *add(frontier **head, coords new)
 	return (node);
 }
 
+/**
+ * get - fetches a node based on index
+ * @head: pointer to the head node
+ * @index: index of the node to fetch
+ *
+ * Return: pointer to the node
+*/
 frontier *get(frontier *head, int index)
 {
 	int i = 0;
@@ -72,6 +92,13 @@ frontier *get(frontier *head, int index)
 	return (head);
 }
 
+/**
+ * delete - deletes a node from a linked list
+ * @head: double pointer to the head node
+ * @index: index of the node to delete
+ *
+ * Return: 0 (Success) 1 (Failure)
+*/
 int delete(frontier **head, unsigned int index)
 {
 	frontier *head1;
@@ -112,6 +139,12 @@ int delete(frontier **head, unsigned int index)
 	return (-1);
 }
 
+/**
+ * listlen - calculates the length of a linked list
+ * @h: head node of the linked list
+ *
+ * Return: length of the linked list
+*/
 int listlen(const frontier *h)
 {
 	int elements = 0;
@@ -125,16 +158,4 @@ int listlen(const frontier *h)
 		current = current->next;
 	}
 	return (elements);
-}
-
-void patch(cell **grid, coords size, coords pos)
-{
-	int i, j;
-	for (i = pos.x; i < pos.x + size.x; i++)
-	{
-		for (j = pos.y; j < pos.y + size.y; j++)
-		{
-			grid[i][j].state = 0;
-		}
-	}
 }
