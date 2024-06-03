@@ -136,37 +136,6 @@ rgba **init_texture(char *file)
 			}
 		}
 	}
+	free(buff);
 	return (texture);
-}
-
-/**
- * free_grid - frees a grid
- * @grid: grid to free
- * @rows: row count
-*/
-void free_grid(cell **grid, int rows)
-{
-	int i;
-
-	for (i = 0; i < rows; i++)
-		free(grid[i]);
-	free(grid);
-}
-
-void free_texture(rgba **arr, int size)
-{
-	int i;
-
-	for (i = 0; i < size; i++)
-		free(arr[i]);
-	free(arr);
-}
-
-void free_sprites(sprite *sprites, int size)
-{
-	int i;
-
-	for (i = 0; i < size; i++)
-		SDL_DestroyTexture(sprites[i].t);
-	free(sprites);
 }

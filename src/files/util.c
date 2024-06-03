@@ -1,4 +1,5 @@
 #include "main.h"
+#include <string.h>
 
 /**
  * distance - calculates distance between two points
@@ -52,4 +53,15 @@ void patch(cell **grid, coords size, coords pos)
 			grid[i][j].state = 0;
 		}
 	}
+}
+
+char *concatenate(char *a, char *b, char *c)
+{
+	int size = strlen(a) + strlen(b) + strlen(c) + 1;
+	char *str = malloc(size);
+	
+	strcpy(str, a);
+	strcat(str, b);
+	strcat(str, c); 	
+	return (str);
 }

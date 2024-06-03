@@ -25,6 +25,7 @@ int menu(SDL_Renderer *display)
 			break;
 		}
 	}
+	SDL_FreeSurface(surface);
 	SDL_DestroyTexture(texture);
 	return (out);
 }

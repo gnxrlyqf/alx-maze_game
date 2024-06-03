@@ -37,7 +37,7 @@ entity *spawn_entities(cell **grid, coordsf pos, entity *entities)
 	return (entities);
 }
 
-void check_entities(player *p, entity **keys, int size)
+int check_entities(player *p, entity **keys, int size)
 {
 	int i;
 	coords pos = {(int)((*p).pos.x / 16), (int)((*p).pos.y / 16)};
@@ -47,11 +47,11 @@ void check_entities(player *p, entity **keys, int size)
 	{
 		key.x = (int)((*keys)[i].pos.x / 16);
 		key.y = (int)((*keys)[i].pos.y / 16);
-		// printf("%d - %d; %d - %d\n", pos.x, pos.y, key.x, key.y);
 		if ((*keys)[i].exists == 1 && key.x == pos.x && key.y == pos.y)
 		{
 			(*keys)[i].exists = 0;		
 			(*p).keys++;
+			return (1);
 		}
 	}
 }

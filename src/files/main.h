@@ -174,10 +174,14 @@ sprite *process_sprites(SDL_Renderer *r, entity *e, sprite *s, int c, player p);
 void draw_floor(SDL_Renderer *renderer, ray *r, column *w, player p);
 entity *spawn_entities(cell **grid, coordsf pos, entity *entities);
 float distancei(coords a, coords b);
-void check_entities(player *p, entity **keys, int size);
+int check_entities(player *p, entity **keys, int size);
 int menu(SDL_Renderer *display);
-void free_texture(rgba **arr, int size);
+void free_rgba(rgba **arr, int size);
 void free_sprites(sprite *sprites, int size);
+char *concatenate(char *a, char *b, char *c);
+SDL_Texture **init_counter(SDL_Renderer *renderer, int count);
+void free_texture(SDL_Texture **counter, int count);
+SDL_Texture **init_cards(SDL_Renderer *r);
 
 void quick_sort_sprite(sprite *arr, int low, int high);
 int partition_sprite(sprite *arr, int low, int high);
@@ -186,5 +190,12 @@ void swap_sprite(sprite *a, sprite *b);
 void quick_sort_wall(column *arr, int low, int high);
 int partition_wall(column *arr, int low, int high);
 void swap_wall(column *a, column *b);
+
+enum cards {
+	FOUND,
+	ALL,
+	NEED,
+	COMPLETE
+};
 
 #endif
