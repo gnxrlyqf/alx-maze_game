@@ -10,8 +10,8 @@
 void maze(cell **grid, coords first, coords range)
 {
 	int i, index;
-	coords focal, offset[4] = {{2, 0}, {-2, 0}, {0, 2}, {0, -2}}, chosen;
-	coords size = {7, 4}, posstart = {13, 1}, posend = {13, 50};
+	coords f, offset[4] = {{2, 0}, {-2, 0}, {0, 2}, {0, -2}}, chosen;
+	coords size = {3, 3}, posstart = {1, 1}, posend = {29, 33};
 	frontier *head = malloc(sizeof(frontier)), *current;
 
 	head->cell = first, head->next = NULL, head->prev = NULL;
@@ -22,14 +22,13 @@ void maze(cell **grid, coords first, coords range)
 		chosen = get(head, index)->cell;
 		for (i = 0; i < 4; i++)
 		{
-			focal.x = chosen.x + offset[i].x, focal.y = chosen.y + offset[i].y;
-			if (focal.x >= 0 && focal.y >= 5 &&
-				focal.x < range.x && focal.y < range.y - 5 &&
-				grid[focal.x][focal.y].state == 1)
-			{
-				grid[focal.x][focal.y].state = 0;
-				grid[focal.x - (offset[i].x / 2)][focal.y - (offset[i].y / 2)].state = 0;
-				add(&head, focal);
+			f.x = chosen.x + offset[i].x, f.y = chosen.y + offset[i].y;
+			if (f.x >= 0 && f.y >= 2 &&
+				f.x < range.x && f.y < range.y - 2 &&
+				grid[f.x][f.y].state == 1) {
+				grid[f.x][f.y].state = 0, grid[f.x][f.y].valid = 1;
+				grid[f.x - (offset[i].x / 2)][f.y - (offset[i].y / 2)].state = 0;
+				add(&head, f);
 			}
 		}
 		delete(&head, index);

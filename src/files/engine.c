@@ -154,40 +154,38 @@ ray vertical(float rtheta, int size, coords dim, cell **grid, coordsf pos)
  *
  * Return: array of vertical lines to be draw on the screen
 */
-column *process_rays(ray *rays, int size, float theta)
+void process_rays(ray *rays, column **walls, int size, float theta)
 {
 	int i, j;
 	float line, distance, lens, brightness;
-	rgba fog = {216, 217, 218, 0}, **texture = init_texture("bricks.png");
-	column *walls = malloc(sizeof(column) * 1260);
+	rgba fog = {216, 217, 218, 0};
 
 	for (int i = 0; i < 1260; i++)
 	{
-		walls[i].pos.x = i;
+		(*walls)[i].pos.x = i;
 		lens = theta - rays[i].theta;
 		if (lens < 0)
 			lens += 2 * PI;
 		if (lens > 2 * PI)
 			lens -= 2 * PI;
 		distance = (rays[i].val * 20) * cos(lens);
-		walls[i].dist = rays[i].val;
-		walls[i].line = (size * 720) / distance;
-		if (walls[i].line > 720)
-			walls[i].line = 720;
+		(*walls)[i].dist = rays[i].val;
+		(*walls)[i].line = (size * 720) / distance;
+		if ((*walls)[i].line > 720)
+			(*walls)[i].line = 720;
 		if (rays[i].dir == 1)
-			walls[i].x = (int)(rays[i].pos.x * 2) % 32;
+			(*walls)[i].x = (int)(rays[i].pos.x * 2) % 32;
 		if (rays[i].dir == 0)
-			walls[i].x = 31 - (int)(rays[i].pos.y * 2) % 32;
+			(*walls)[i].x = 31 - (int)(rays[i].pos.y * 2) % 32;
 		brightness = 1 - rays[i].val / 720;
 		if (brightness < 0)
 			brightness = 0;
-		walls[i].s = (rays[i].dir == 0 ? .8 : 1) * brightness;
-		walls[i].f = rays[i].val / 300;
-		if (walls[i].f > 1)
-			walls[i].f = 1;
+		(*walls)[i].s = (rays[i].dir == 0 ? .8 : 1) * brightness;
+		(*walls)[i].f = rays[i].val / 300;
+		if ((*walls)[i].f > 1)
+			(*walls)[i].f = 1;
 	}
-	quick_sort_wall(walls, 0, 1259);
-	return (walls);
+	quick_sort_wall(*walls, 0, 1259);
 }
 
 /**
@@ -199,33 +197,33 @@ column *process_rays(ray *rays, int size, float theta)
  *
  * Return: array of sprites to be drawn on the screen
 */
-sprite *process_sprites(SDL_Renderer *r, entity *e, int size, player p)
+sprite *process_sprites(SDL_Renderer *r, entity *e, sprite* s, int c, player p)
 {
 	int i;
 	float scale;
 	entity curr;
 	SDL_Rect draw;
-	SDL_Texture *texture;
 	coordsf temp, result;
-	sprite *sprites = malloc(sizeof(sprite) * size);
 
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < c; i++)
 	{
+		s[i].visible = 1;
 		curr = e[i];
 		temp.x = curr.pos.x - p.pos.x;
 		temp.y = curr.pos.y - p.pos.y;
 		result.x = (temp.y * cos(p.theta)) - (temp.x * sin(p.theta));
 		result.y = (temp.x * cos(p.theta)) + (temp.y * sin(p.theta));
 		scale = 360 / result.y;
-		sprites[i].dist = distance(curr.pos, p.pos);
-		sprites[i].scale = scale;
+		s[i].dist = distance(curr.pos, p.pos);
+		s[i].scale = scale;
 		curr.pos.x = result.x, curr.pos.y = result.y;
-		draw.x = (result.x * 1260 / result.y) + (1260 / 2) - (16 * scale);
-		draw.y = (curr.z * 1260 / result.y) + (720 / 2);
-		draw.w = draw.h = scale * 32;
-		sprites[i].rect = draw;
-		sprites[i].t = SDL_CreateTextureFromSurface(r, SDL_LoadBMP("skull007.bmp"));
+		draw.x = (result.x * 1260 / result.y) + (1260 / 2) - (8 * scale);
+		draw.y = (3 * 1260 / result.y) + (720 / 2);
+		draw.w = draw.h = scale * 16;
+		if (e[i].exists != 1)
+			s[i].visible = 0;
+		s[i].rect = draw;
 	}
-	// quick_sort_sprite(sprites, 0, 1);
-	return (sprites);
+	quick_sort_sprite(s, 0, c - 1);
+	return(s);
 }

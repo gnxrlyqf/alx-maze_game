@@ -44,6 +44,7 @@ typedef struct cell
 	coords pos;
 	int size;
 	int state;
+	int valid;
 } cell;
 
 /**
@@ -84,36 +85,37 @@ typedef struct rgba
 } rgba;
 
 /**
- * struct entity - struct representing game entity
- * @behavior: entity behavior
- * 		0: prop
- * 		1: item
- * 		2: patrol
- * 		3: enemy
- * 		4: boss
- * @pos: entity position
- * @z: elevation
-*/
-typedef struct entity
-{
-	int behavior;
-	coordsf pos;
-	float z;
-} entity;
-
-/**
  * struct sprite - struct representing entity sprite
  * @rect: rectangle for drawing sprite
  * @t: texture of sprite
  * @dist: distance from player
  * @scale: scaling factor
+ * @visible: boolean for sprite visibility
 */
 typedef struct sprite
 {
 	SDL_Rect rect;
 	SDL_Texture *t;
 	float dist, scale;
+	int visible;
 } sprite;
+
+/**
+ * struct entity - struct representing game entity
+ * @behavior: entity behavior
+ * 		0: doesn't exist
+ * 		1: item
+ * 		2: enemy
+ * 		3: boss
+ * @pos: entity position
+ * @z: elevation
+*/
+typedef struct entity
+{
+	int behavior, exists;
+	coordsf pos;
+	float z;
+} entity;
 
 /**
  * struct column - vertical line for drawing walls
@@ -144,12 +146,13 @@ typedef struct player
 	coordsf pos;
 	float theta;
 	coordsf d;
+	int keys;
 } player;
 
 int instantiate(SDL_instance *instance, coords dim, char *name, coords pos);
 void draw_map(SDL_Renderer *m, cell **g, coords d, int s, coordsf p, ray *r);
 cell **init_grid(coords dimensions, int cellSize);
-int events(cell **grid, int size);
+int events();
 void free_grid(cell **grid, int rows);
 void controls(cell **grid, player *p);
 void game(cell **grid, SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2);
@@ -158,8 +161,8 @@ float distance(coordsf a, coordsf b);
 ray horizontal(float rtheta, int size, coords dim, cell **grid, coordsf pos);
 ray vertical(float rtheta, int size, coords dim, cell **grid, coordsf pos);
 int ftoi(float x);
-column *process_rays(ray *rays, int size, float theta);
-void render(SDL_Renderer *display, column *walls, sprite *sprites, coords res);
+void process_rays(ray *rays, column **walls, int size, float theta);
+void render(SDL_Renderer *display, column *w, sprite *s, int c, rgba **texture);
 void maze(cell **grid, coords first, coords range);
 frontier *add(frontier **head, coords new);
 frontier *get(frontier *head, int index);
@@ -167,7 +170,14 @@ int delete(frontier **head, unsigned int index);
 int listlen(const frontier *h);
 rgba **init_texture(char *file);
 void patch(cell **grid, coords size, coords pos);
-sprite *process_sprites(SDL_Renderer *r, entity *e, int size, player p);
+sprite *process_sprites(SDL_Renderer *r, entity *e, sprite *s, int c, player p);
+void draw_floor(SDL_Renderer *renderer, ray *r, column *w, player p);
+entity *spawn_entities(cell **grid, coordsf pos, entity *entities);
+float distancei(coords a, coords b);
+void check_entities(player *p, entity **keys, int size);
+int menu(SDL_Renderer *display);
+void free_texture(rgba **arr, int size);
+void free_sprites(sprite *sprites, int size);
 
 void quick_sort_sprite(sprite *arr, int low, int high);
 int partition_sprite(sprite *arr, int low, int high);

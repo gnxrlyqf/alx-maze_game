@@ -33,9 +33,9 @@ int partition_sprite(sprite *arr, int low, int high)
 
 	while (i < j)
 	{
-		while (arr[i].dist <= pivot.dist && i <= high - 1)
+		while (arr[i].dist >= pivot.dist && i <= high - 1)
 			i++;
-		while (arr[j].dist > pivot.dist && j >= low + 1)
+		while (arr[j].dist < pivot.dist && j >= low + 1)
 			j--;
 		if (i < j)
 			swap_sprite(&arr[i], &arr[j]);

@@ -1,4 +1,5 @@
 #include "main.h"
+#include <SDL2/SDL_image.h>
 #define PI 3.14159265358979
 #define DEG 0.0174533
 #define RAD 57.2957795
@@ -13,27 +14,48 @@
 */
 void game(cell **grid, SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2)
 {
-	int size = 16, s_count;
+	int size = 16, count = 20, i;
+	player p = {{24, 24}, PI / 2, {0, 0}, 0};
+	SDL_Rect e;
 	ray *rays = malloc(sizeof(ray) * 1260);
-	player p = {{264, 48}, PI / 2, {0, 0}};
-	column *walls;
-	sprite *sprites;
-	entity *entities = malloc(sizeof(entity) * 2);
+	column *walls = malloc(sizeof(column) * 1260);
+	entity *entities = malloc(sizeof(entity) * count);;
+	sprite *sprites = malloc(sizeof(sprite) * count);
+	rgba **texture = init_texture("src/assets/bricks.png");
+	SDL_Surface *surface = IMG_Load("src/assets/key.png");
 
-	entities[0].pos.x = 15 * 16 + 8, entities[1].pos.x = 17 * 16 + 8;
-	entities[0].pos.y = 5 * 16 + 8, entities[1].pos.y = 2 * 16 + 8;
-
+	entities = spawn_entities(grid, p.pos, entities);
+	for (i = 0; i < count; i++)
+		sprites[i].t = SDL_CreateTextureFromSurface(d, surface);
 	while (1)
 	{
 		controls(grid, &p);
 		rays = raycast(size, d1, grid, rays, p);
-		walls = process_rays(rays, size, p.theta);
-		sprites = process_sprites(d, entities, s_count, p);
-		render(d, walls, sprites, d2);
+		process_rays(rays, &walls, size, p.theta);
+		check_entities(&p, &entities, count);
+		sprites = process_sprites(d, entities, sprites, count, p);
+		render(d, walls, sprites, count, texture);
 		draw_map(m, grid, d1, size, p.pos, rays);
-		if (events(grid, size) == 1)
-			return;
+		if (events() == 1 || p.keys == 20)
+			break;
+		for (int i = 0; i < count; i++)
+		{
+			e.x = entities[i].pos.x - 4;
+			e.y = entities[i].pos.y - 4;
+			e.w = e.h = 8;
+			SDL_SetRenderDrawColor(m, 0, 0, 255, 0);
+			if (entities[i].exists == 1)
+				SDL_RenderFillRect(m, &e);
+		}
+		SDL_RenderPresent(d), SDL_RenderPresent(m);
 	}
+	free(rays);
+	free(walls);
+	free(entities);
+	SDL_FreeSurface(surface);
+	free_sprites(sprites, count);
+	free_texture(texture, 32);
+	free_grid(grid, 33);
 }
 
 /**
@@ -48,9 +70,9 @@ void controls(cell **grid, player *p)
 	float strafe = p->theta - 90 * DEG;
 
 	if (keystate[SDL_SCANCODE_LEFT])
-		p->theta -= .025, p->d.x = cos(p->theta), p->d.y = sin(p->theta);
+		p->theta -= .03, p->d.x = cos(p->theta), p->d.y = sin(p->theta);
 	if (keystate[SDL_SCANCODE_RIGHT])
-		p->theta += .025, p->d.x = cos(p->theta), p->d.y = sin(p->theta);
+		p->theta += .03, p->d.x = cos(p->theta), p->d.y = sin(p->theta);
 	if (keystate[SDL_SCANCODE_W])
 	{
 		check.x = p->pos.x + p->d.x * 2, check.y = p->pos.y + p->d.y * 2;

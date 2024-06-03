@@ -12,6 +12,12 @@ float distance(coordsf a, coordsf b)
 	return (sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2)));
 }
 
+float distancei(coords a, coords b)
+{
+	return (sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2)));
+}
+
+
 /**
  * ftoi - rounds a float into an int
  * @x: float to round

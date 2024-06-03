@@ -39,11 +39,10 @@ cell **init_grid(coords res, int cellSize)
  *
  * Return: 1 (close window) 0 (no events)
 */
-int events(cell **grid, int size)
+int events()
 {
 	SDL_Event event;
 	SDL_Keycode key;
-	int mousePosX, mousePosY;
 
 	while (SDL_PollEvent(&event))
 	{
@@ -52,18 +51,13 @@ int events(cell **grid, int size)
 			case SDL_WINDOWEVENT:
 				if (event.window.event == SDL_WINDOWEVENT_CLOSE)
 					return (1);
-			case SDL_MOUSEMOTION:
-				mousePosX = event.button.x / size;
-				mousePosY = event.button.y / size;
-				if (event.button.button == SDL_BUTTON_LEFT)
-					grid[mousePosX][mousePosY].state = 1;
-				if (event.button.button == SDL_BUTTON_MIDDLE)
-					grid[mousePosX][mousePosY].state = 0;
 				break;
 			case SDL_KEYDOWN:
 				key = event.key.keysym.sym;
 				if (key == SDLK_ESCAPE)
 					return (1);
+				if (key == SDLK_SPACE)
+					return (2);
 				break;
 		}
 	}
@@ -152,7 +146,27 @@ rgba **init_texture(char *file)
 */
 void free_grid(cell **grid, int rows)
 {
-	for (int i = 0; i < rows; i++)
+	int i;
+
+	for (i = 0; i < rows; i++)
 		free(grid[i]);
 	free(grid);
+}
+
+void free_texture(rgba **arr, int size)
+{
+	int i;
+
+	for (i = 0; i < size; i++)
+		free(arr[i]);
+	free(arr);
+}
+
+void free_sprites(sprite *sprites, int size)
+{
+	int i;
+
+	for (i = 0; i < size; i++)
+		SDL_DestroyTexture(sprites[i].t);
+	free(sprites);
 }
