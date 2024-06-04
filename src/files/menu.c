@@ -2,6 +2,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+/**
+ * menu - displays title screen
+ * @display: sdl renderer
+ *
+ * Return: gamestate (int)
+*/
 int menu(SDL_Renderer *display)
 {
 	SDL_Surface *surface = IMG_Load("src/assets/title.png");
@@ -9,7 +15,7 @@ int menu(SDL_Renderer *display)
 	int out = 0, event = 0;
 
 	texture = SDL_CreateTextureFromSurface(display, surface);
-	while (1)	
+	while (1)
 	{
 		SDL_RenderCopy(display, texture, NULL, NULL);
 		SDL_RenderPresent(display);

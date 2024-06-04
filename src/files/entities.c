@@ -2,7 +2,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-entity *spawn_entities(cell **grid, coordsf pos)
+/**
+ * spawn_entities - spawns key entities in random positions
+ * @grid: two dimensional array of cells representing grid
+ *
+ * Return: array of entities
+*/
+entity *spawn_entities(cell **grid)
 {
 	coords offsets[4] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 	coords r;
@@ -38,6 +44,14 @@ entity *spawn_entities(cell **grid, coordsf pos)
 	return (entities);
 }
 
+/**
+ * check_entities - checks if player picks up a key
+ * @p: player struct
+ * @keys: pointer to array of entities
+ * @size: size of array
+ *
+ * Return: 1 (picked up) 0 (not picked up)
+*/
 int check_entities(player *p, entity **keys, int size)
 {
 	int i;
@@ -50,7 +64,7 @@ int check_entities(player *p, entity **keys, int size)
 		key.y = (int)((*keys)[i].pos.y / 16);
 		if ((*keys)[i].exists == 1 && key.x == pos.x && key.y == pos.y)
 		{
-			(*keys)[i].exists = 0;		
+			(*keys)[i].exists = 0;
 			(*p).keys++;
 			return (1);
 		}

@@ -172,8 +172,7 @@ int listlen(const frontier *h);
 rgba **init_texture(char *file);
 void patch(cell **grid, coords size, coords pos);
 sprite *process_sprites(SDL_Renderer *r, entity *e, sprite *s, int c, player p);
-void draw_floor(SDL_Renderer *renderer, ray *r, column *w, player p);
-entity *spawn_entities(cell **grid, coordsf pos);
+entity *spawn_entities(cell **grid);
 float distancei(coords a, coords b);
 int check_entities(player *p, entity **keys, int size);
 int menu(SDL_Renderer *display);
@@ -185,8 +184,8 @@ void free_texture(SDL_Texture **counter, int count);
 SDL_Texture **init_cards(SDL_Renderer *r);
 void free_all(ray *rays, column *walls, entity *entities, sprite *sprites,
 rgba **texture, cell **grid, SDL_Texture **counter, SDL_Texture **cards);
-int cards_events(SDL_Renderer *d, player p, SDL_Texture **cards, int *t,
-SDL_Texture **card);
+int cards_events(SDL_Renderer *d, player p, SDL_Texture **cards,
+int t1, int *t, SDL_Texture **card);
 
 void quick_sort_sprite(sprite *arr, int low, int high);
 int partition_sprite(sprite *arr, int low, int high);

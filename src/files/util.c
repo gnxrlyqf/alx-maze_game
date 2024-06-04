@@ -13,6 +13,14 @@ float distance(coordsf a, coordsf b)
 	return (sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2)));
 }
 
+/**
+ * distancei - calculates distance between two points (float)
+ * @a: point a
+ * @b: point b
+ *
+ * Return: distance between two points
+*/
+
 float distancei(coords a, coords b)
 {
 	return (sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2)));
@@ -55,13 +63,21 @@ void patch(cell **grid, coords size, coords pos)
 	}
 }
 
+/**
+ * concatenate - concatenates three strings
+ * @a: string a
+ * @b: string b
+ * @c: string c
+ *
+ * Return: concatenation of the three strings
+*/
 char *concatenate(char *a, char *b, char *c)
 {
 	int size = strlen(a) + strlen(b) + strlen(c) + 1;
 	char *str = malloc(size);
-	
+
 	strcpy(str, a);
 	strcat(str, b);
-	strcat(str, c); 	
+	strcat(str, c);
 	return (str);
 }

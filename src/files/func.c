@@ -34,12 +34,9 @@ cell **init_grid(coords res, int cellSize)
 
 /**
  * events - polls mouse and keyboard events
- * @grid: two dimensional array of cells representing grid
- * @size: size of cell
- *
  * Return: 1 (close window) 0 (no events)
 */
-int events()
+int events(void)
 {
 	SDL_Event event;
 	SDL_Keycode key;
@@ -140,6 +137,17 @@ rgba **init_texture(char *file)
 	return (texture);
 }
 
+/**
+ * free_all - frees all allocated memory
+ * @rays: array of rays
+ * @walls: array of columns
+ * @entities: array of entities
+ * @sprites: array of sprites
+ * @texture: two dimensional array of pixels
+ * @grid: two dimensional array of cells representing grid
+ * @counter: array of textures representing key counter
+ * @cards: array of textures representing text cards
+*/
 void free_all(ray *rays, column *walls, entity *entities, sprite *sprites,
 rgba **texture, cell **grid, SDL_Texture **counter, SDL_Texture **cards) {
 	free(rays);

@@ -33,5 +33,5 @@ int main(void)
 	SDL_DestroyWindow(map.window), SDL_DestroyWindow(display.window);
 	SDL_Quit();
 	return (0);
-		
+
 }

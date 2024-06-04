@@ -149,6 +149,7 @@ ray vertical(float rtheta, int size, coords dim, cell **grid, coordsf pos)
 /**
  * process_rays - processes rays returned by raycaster
  * @rays: ray array to process
+ * @walls: pointer to array of columns
  * @size: cell size
  * @theta: player angle
  *
@@ -192,12 +193,13 @@ void process_rays(ray *rays, column **walls, int size, float theta)
  * process_sprites - processes entities into sprites to be drawn
  * @r: pointer to renderer
  * @e: array of entities
- * @size: size of array
+ * @s: array of sprites
+ * @c: size of array
  * @p: player struct
  *
  * Return: array of sprites to be drawn on the screen
 */
-sprite *process_sprites(SDL_Renderer *r, entity *e, sprite* s, int c, player p)
+sprite *process_sprites(SDL_Renderer *r, entity *e, sprite *s, int c, player p)
 {
 	int i;
 	float scale;
@@ -225,5 +227,5 @@ sprite *process_sprites(SDL_Renderer *r, entity *e, sprite* s, int c, player p)
 		s[i].rect = draw;
 	}
 	quick_sort_sprite(s, 0, c - 1);
-	return(s);
+	return (s);
 }

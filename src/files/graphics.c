@@ -8,15 +8,15 @@
 /**
  * render - handles rendering of game elements
  * @display: renderer on which to draw elements
- * @walls: array of vertical lines forming walls
- * @sprites: array of sprites to be drawn
- * @res: screen resolution
+ * @w: array of vertical lines forming walls
+ * @s: array of sprites to be drawn
+ * @c: sprite count
+ * @texture: two dimensional array representing texture
 */
 void render(SDL_Renderer *display, column *w, sprite *s, int c, rgba **texture)
 {
 	int i, j, texturex, si = 0;
 	SDL_Rect wall, floor = {0, 360, 1260, 360}, sky = {0, 0, 1260, 360};
-
 	rgba fog = {216, 217, 218, 0};
 	column curr;
 	sprite scurr;
@@ -34,8 +34,6 @@ void render(SDL_Renderer *display, column *w, sprite *s, int c, rgba **texture)
 		{
 			wall.y = ((720 - curr.line * 32) / 2) + (curr.line * j);
 			wall.w = 1, wall.h = curr.line + 1;
-			if (curr.x > 31)
-				curr.x = 31;
 			SDL_SetRenderDrawColor(display,
 				(texture[curr.x][j].r * curr.s) * (1 - curr.f) + (curr.f * fog.r),
 				(texture[curr.x][j].g * curr.s) * (1 - curr.f) + (curr.f * fog.g),
@@ -44,58 +42,14 @@ void render(SDL_Renderer *display, column *w, sprite *s, int c, rgba **texture)
 			);
 			SDL_RenderFillRect(display, &wall);
 		}
-		if (s[si].visible == 0)
-		{
-			if(si < c - 1)
-				si++;
-			continue;
-		}
 		if (scurr.dist < curr.dist)
 		{
 			SDL_SetRenderDrawColor(display, 255, 255, 255, 0);
 			SDL_RenderCopy(display, s[si].t, NULL, &s[si].rect);
 			SDL_RenderDrawRect(display, &s[si].rect);
 		}
-		else if(si < c - 1)
+		else if (si < c - 1)
 			si++;
-	}
-}
-
-void draw_floor(SDL_Renderer *renderer, ray *r, column *w, player p)
-{
-	int i, y, lineoff, tx, ty;
-	column curr;
-	float dy, deg, ra, rafix;
-	SDL_Rect floor;
-	rgba **texture = init_texture("cobblestone.png");
-
-	for (i = 0; i < 1260; i++)
-	{
-		curr = w[i];
-		lineoff = 360 - (curr.line / 2);
-		for (y = lineoff + curr.line; y < 720; y++)
-		{
-			dy = y - (720 / 2);
-			deg = r[curr.pos.x].theta;
-			ra = p.theta - deg;
-			if (ra > 2 * PI)
-				ra -= 2 * PI;
-			if (ra < 0)
-				ra += 2 * PI;
-			tx = (int)((p.pos.x / 2) + cos(deg) * 720 * 32 / dy / cos(ra)) & 31;
-			ty = (int)((p.pos.x / 2) - cos(deg) * 720 * 32 / dy / cos(ra)) & 31;
-			floor.x = curr.pos.x;
-			floor.y = ((720 - curr.line * 32) / 2) - y;
-			floor.w = 1, floor.h = curr.line + 1;
-			SDL_SetRenderDrawColor(renderer,
-				(texture[tx][ty].r * curr.s) * (1 - curr.f),
-				(texture[tx][ty].g * curr.s) * (1 - curr.f),
-				(texture[tx][ty].b * curr.s) * (1 - curr.f),
-				255
-			);
-			SDL_RenderFillRect(renderer, &floor);
-
-		}
 	}
 }
 
@@ -107,6 +61,8 @@ void draw_floor(SDL_Renderer *renderer, ray *r, column *w, player p)
  * @s: cell size
  * @p: player position
  * @r: array of rays
+ * @c: entity count
+ * @entities: array of entities
 */
 void draw_map(SDL_Renderer *m, cell **g, coords d, int s, coordsf p, ray *r,
 int c, entity *entities) {
@@ -139,8 +95,10 @@ int c, entity *entities) {
 	}
 }
 
-int cards_events(SDL_Renderer *d, player p, SDL_Texture **cards, int *t,
-SDL_Texture **card) {
+int cards_events(SDL_Renderer *d, player p, SDL_Texture **cards,
+int t1, int *t, SDL_Texture **card) {
+	if (time(NULL) < t1 + 3)
+		SDL_RenderCopy(d, *card, NULL, NULL);
 	if (p.pos.x > 16 && p.pos.x < 64 && p.pos.y > 16 && p.pos.y < 64)
 	{
 		(*card) = cards[OBJECTIVE];
@@ -170,6 +128,5 @@ SDL_Texture **card) {
 	}
 	if (events() == 1)
 		*t = time(NULL);
-	// SDL_RenderCopy(d, *card, NULL, NULL);
 	return (0);
 }

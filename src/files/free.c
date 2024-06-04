@@ -14,6 +14,11 @@ void free_grid(cell **grid, int rows)
 	free(grid);
 }
 
+/**
+ * free_rgba - frees a two dimensional array of pixels
+ * @arr: array to free
+ * @size: array row size
+*/
 void free_rgba(rgba **arr, int size)
 {
 	int i;
@@ -23,6 +28,11 @@ void free_rgba(rgba **arr, int size)
 	free(arr);
 }
 
+/**
+ * free_sprites - frees an array of sprites
+ * @sprites: array to free
+ * @size: size of array
+*/
 void free_sprites(sprite *sprites, int size)
 {
 	int i;
@@ -32,6 +42,11 @@ void free_sprites(sprite *sprites, int size)
 	free(sprites);
 }
 
+/**
+ * free_texture - frees array of sdl textures
+ * @texture: array to pointers of textures
+ * @count:size of array
+*/
 void free_texture(SDL_Texture **texture, int count)
 {
 	int i;

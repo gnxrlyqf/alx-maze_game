@@ -9,7 +9,6 @@
 
 /**
  * game - main game loop
- * @grid: two dimensional array of cells representing grid
  * @m: map renderer
  * @d: display renderer
  * @d1: grid dimensions
@@ -17,15 +16,15 @@
 */
 void game(SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2)
 {
-	int size = 16, count = 20, i, t1, t2;
+	int size = 16, count = 20, i, t1, t2, faded = 0;
 	player p = {{24, 24}, PI / 2, {0, 0}, 0};
 	SDL_Rect e;
 	cell **grid = init_grid(d1, size);
 	ray *rays = malloc(sizeof(ray) * 1260);
 	column *walls = malloc(sizeof(column) * 1260);
-	entity *entities = spawn_entities(grid, p.pos);
+	entity *entities = spawn_entities(grid);
 	sprite *sprites = malloc(sizeof(sprite) * count);
-	rgba **texture = init_texture("src/assets/bricks.png");
+	rgba **texture = init_texture("src/assets/bricks.png"), co = {0, 0, 0, 255};
 	SDL_Surface *key = IMG_Load("src/assets/key.png");
 	SDL_Texture **cards = init_cards(d), **counter = init_counter(d, 20), *c;
 
@@ -33,8 +32,11 @@ void game(SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2)
 		sprites[i].t = SDL_CreateTextureFromSurface(d, key);
 	while (1)
 	{
-		// c = NULL;
 		controls(grid, &p), rays = raycast(size, d1, grid, rays, p);
+		if (p.theta < 0)
+			p.theta += 2 * PI;
+		if (p.theta > 2 * PI)
+			p.theta -= 2 * PI;
 		process_rays(rays, &walls, size, p.theta);
 		if (check_entities(&p, &entities, count) == 1)
 		{
@@ -48,9 +50,7 @@ void game(SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2)
 		render(d, walls, sprites, count, texture);
 		draw_map(m, grid, d1, size, p.pos, rays, count, entities);
 		SDL_RenderCopy(d, counter[p.keys], NULL, NULL);
-		if (time(NULL) < t1 + 3)
-			SDL_RenderCopy(d, c, NULL, NULL);
-		if (cards_events(d, p, cards, &t2, &c) == 1)
+		if (cards_events(d, p, cards, t1, &t2, &c) == 1)
 			break;
 		SDL_RenderPresent(d), SDL_RenderPresent(m);
 	}

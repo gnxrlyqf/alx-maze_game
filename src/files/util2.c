@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include <SDL2/SDL_image.h>
 
+/**
+ * init_counter - initializes key counter text cards
+ * @renderer: pointer to renderer
+ * @count: key count
+ *
+ * Return: array of textures
+*/
 SDL_Texture **init_counter(SDL_Renderer *renderer, int count)
 {
 	int i;
@@ -23,6 +30,12 @@ SDL_Texture **init_counter(SDL_Renderer *renderer, int count)
 	return (counter);
 }
 
+/**
+ * init_cards - initializes text cards
+ * @r: pointer to renderer
+ *
+ * Return: array of textures
+*/
 SDL_Texture **init_cards(SDL_Renderer *r)
 {
 	SDL_Texture **cards = malloc(sizeof(SDL_Texture *) * 6);
@@ -48,5 +61,5 @@ SDL_Texture **init_cards(SDL_Renderer *r)
 	SDL_FreeSurface(objective);
 	SDL_FreeSurface(quit);
 
-	return(cards);
+	return (cards);
 }
