@@ -150,12 +150,13 @@ typedef struct player
 } player;
 
 int instantiate(SDL_instance *instance, coords dim, char *name, coords pos);
-void draw_map(SDL_Renderer *m, cell **g, coords d, int s, coordsf p, ray *r);
+void draw_map(SDL_Renderer *m, cell **g, coords d, int s, coordsf p, ray *r,
+int c, entity *entities);
 cell **init_grid(coords dimensions, int cellSize);
 int events();
 void free_grid(cell **grid, int rows);
 void controls(cell **grid, player *p);
-void game(cell **grid, SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2);
+void game(SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2);
 ray *raycast(int size, coords dim, cell **grid, ray *rays, player p);
 float distance(coordsf a, coordsf b);
 ray horizontal(float rtheta, int size, coords dim, cell **grid, coordsf pos);
@@ -172,7 +173,7 @@ rgba **init_texture(char *file);
 void patch(cell **grid, coords size, coords pos);
 sprite *process_sprites(SDL_Renderer *r, entity *e, sprite *s, int c, player p);
 void draw_floor(SDL_Renderer *renderer, ray *r, column *w, player p);
-entity *spawn_entities(cell **grid, coordsf pos, entity *entities);
+entity *spawn_entities(cell **grid, coordsf pos);
 float distancei(coords a, coords b);
 int check_entities(player *p, entity **keys, int size);
 int menu(SDL_Renderer *display);
@@ -182,6 +183,10 @@ char *concatenate(char *a, char *b, char *c);
 SDL_Texture **init_counter(SDL_Renderer *renderer, int count);
 void free_texture(SDL_Texture **counter, int count);
 SDL_Texture **init_cards(SDL_Renderer *r);
+void free_all(ray *rays, column *walls, entity *entities, sprite *sprites,
+rgba **texture, cell **grid, SDL_Texture **counter, SDL_Texture **cards);
+int cards_events(SDL_Renderer *d, player p, SDL_Texture **cards, int *t,
+SDL_Texture **card);
 
 void quick_sort_sprite(sprite *arr, int low, int high);
 int partition_sprite(sprite *arr, int low, int high);
@@ -195,7 +200,9 @@ enum cards {
 	FOUND,
 	ALL,
 	NEED,
-	COMPLETE
+	COMPLETE,
+	OBJECTIVE,
+	QUIT
 };
 
 #endif

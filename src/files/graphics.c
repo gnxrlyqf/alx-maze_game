@@ -1,4 +1,5 @@
 #include "main.h"
+#include <time.h>
 #include <SDL2/SDL.h>
 #define PI 3.14159265358979
 #define DEG 0.0174533
@@ -107,10 +108,10 @@ void draw_floor(SDL_Renderer *renderer, ray *r, column *w, player p)
  * @p: player position
  * @r: array of rays
 */
-void draw_map(SDL_Renderer *m, cell **g, coords d, int s, coordsf p, ray *r)
-{
+void draw_map(SDL_Renderer *m, cell **g, coords d, int s, coordsf p, ray *r,
+int c, entity *entities) {
 	int i, j;
-	SDL_Rect player = {p.x - 4, p.y - 4, 8, 8}, cell;
+	SDL_Rect player = {p.x - 4, p.y - 4, 8, 8}, cell, e;
 
 	SDL_SetRenderDrawColor(m, 255, 255, 255, 255);
 	SDL_RenderClear(m);
@@ -127,4 +128,48 @@ void draw_map(SDL_Renderer *m, cell **g, coords d, int s, coordsf p, ray *r)
 	SDL_RenderFillRect(m, &player);
 	for (i = 0; i < 1260; i++)
 		SDL_RenderDrawLine(m, p.x, p.y, r[i].pos.x, r[i].pos.y);
+	for (int i = 0; i < c; i++)
+	{
+		e.x = entities[i].pos.x - 4;
+		e.y = entities[i].pos.y - 4;
+		e.w = e.h = 8;
+		SDL_SetRenderDrawColor(m, 0, 0, 255, 0);
+		if (entities[i].exists == 1)
+			SDL_RenderFillRect(m, &e);
+	}
+}
+
+int cards_events(SDL_Renderer *d, player p, SDL_Texture **cards, int *t,
+SDL_Texture **card) {
+	if (p.pos.x > 16 && p.pos.x < 64 && p.pos.y > 16 && p.pos.y < 64)
+	{
+		(*card) = cards[OBJECTIVE];
+		SDL_RenderCopy(d, *card, NULL, NULL);
+	}
+	if (p.pos.x > 456 && p.pos.x < 520 && p.pos.y > 520 && p.pos.y < 584)
+	{
+		if (p.keys < 20)
+		{
+			(*card) = cards[NEED];
+			SDL_RenderCopy(d, *card, NULL, NULL);
+		}
+		else if (p.keys == 20)
+		{
+			(*card) = cards[COMPLETE];
+			SDL_RenderCopy(d, *card, NULL, NULL);
+			SDL_RenderPresent(d);
+			return (1);
+		}
+	}
+	if (time(NULL) < (*t) + 3)
+	{
+		(*card) = cards[QUIT];
+		SDL_RenderCopy(d, *card, NULL, NULL);
+		if (events() == 1)
+			return (1);
+	}
+	if (events() == 1)
+		*t = time(NULL);
+	// SDL_RenderCopy(d, *card, NULL, NULL);
+	return (0);
 }

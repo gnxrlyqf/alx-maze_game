@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-entity *spawn_entities(cell **grid, coordsf pos, entity *entities)
+entity *spawn_entities(cell **grid, coordsf pos)
 {
 	coords offsets[4] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 	coords r;
 	int i, j, count = 20, sides;
+	entity *entities = malloc(sizeof(entity) * count);
 
 	srand(time(NULL));
 	for (i = 0; i < count; i++)

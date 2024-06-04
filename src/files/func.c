@@ -139,3 +139,15 @@ rgba **init_texture(char *file)
 	free(buff);
 	return (texture);
 }
+
+void free_all(ray *rays, column *walls, entity *entities, sprite *sprites,
+rgba **texture, cell **grid, SDL_Texture **counter, SDL_Texture **cards) {
+	free(rays);
+	free(walls);
+	free(entities);
+	free_sprites(sprites, 20);
+	free_rgba(texture, 32);
+	free_grid(grid, 33);
+	free_texture(counter, 21);
+	free_texture(cards, 4);
+}
