@@ -69,4 +69,5 @@ int check_entities(player *p, entity **keys, int size)
 			return (1);
 		}
 	}
+	return (0);
 }

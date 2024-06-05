@@ -21,9 +21,9 @@ ray *raycast(int size, coords dim, cell **grid, ray *rays, player p)
 	dim.y = dim.y / size;
 	float rtheta = p.theta - (DEG * 30);
 	int i;
-	ray ray, hor, ver;
+	ray hor, ver;
 
-	for (int i = 0; i < 1260; i++)
+	for (i = 0; i < 1260; i++)
 	{
 		ver = vertical(rtheta, size, dim, grid, p.pos);
 		hor = horizontal(rtheta, size, dim, grid, p.pos);
@@ -157,11 +157,10 @@ ray vertical(float rtheta, int size, coords dim, cell **grid, coordsf pos)
 */
 void process_rays(ray *rays, column **walls, int size, float theta)
 {
-	int i, j;
-	float line, distance, lens, brightness;
-	rgba fog = {216, 217, 218, 0};
+	int i;
+	float distance, lens, brightness;
 
-	for (int i = 0; i < 1260; i++)
+	for (i = 0; i < 1260; i++)
 	{
 		(*walls)[i].pos.x = i;
 		lens = theta - rays[i].theta;
@@ -191,7 +190,6 @@ void process_rays(ray *rays, column **walls, int size, float theta)
 
 /**
  * process_sprites - processes entities into sprites to be drawn
- * @r: pointer to renderer
  * @e: array of entities
  * @s: array of sprites
  * @c: size of array
@@ -199,7 +197,7 @@ void process_rays(ray *rays, column **walls, int size, float theta)
  *
  * Return: array of sprites to be drawn on the screen
 */
-sprite *process_sprites(SDL_Renderer *r, entity *e, sprite *s, int c, player p)
+sprite *process_sprites(entity *e, sprite *s, int c, player p)
 {
 	int i;
 	float scale;

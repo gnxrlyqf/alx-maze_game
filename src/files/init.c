@@ -1,4 +1,5 @@
 #include "main.h"
+#include <SDL2/SDL_image.h>
 #include <png.h>
 #include <zlib.h>
 #include <stdlib.h>
@@ -33,36 +34,7 @@ cell **init_grid(coords res, int cellSize)
 }
 
 /**
- * events - polls mouse and keyboard events
- * Return: 1 (close window) 0 (no events)
-*/
-int events(void)
-{
-	SDL_Event event;
-	SDL_Keycode key;
-
-	while (SDL_PollEvent(&event))
-	{
-		switch (event.type)
-		{
-			case SDL_WINDOWEVENT:
-				if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-					return (1);
-				break;
-			case SDL_KEYDOWN:
-				key = event.key.keysym.sym;
-				if (key == SDLK_ESCAPE)
-					return (1);
-				if (key == SDLK_SPACE)
-					return (2);
-				break;
-		}
-	}
-	return (0);
-}
-
-/**
- * instantiate - creates window
+ * init_window - creates window
  * @instance: SDL instance to create
  * @dim: window dimensions
  * @name: window name
@@ -70,7 +42,7 @@ int events(void)
  *
  * Return: 0 (Success)
 */
-int instantiate(SDL_instance *instance, coords dim, char *name, coords pos)
+int init_window(SDL_instance *instance, coords dim, char *name, coords pos)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
@@ -138,24 +110,62 @@ rgba **init_texture(char *file)
 }
 
 /**
- * free_all - frees all allocated memory
- * @rays: array of rays
- * @walls: array of columns
- * @entities: array of entities
- * @sprites: array of sprites
- * @texture: two dimensional array of pixels
- * @grid: two dimensional array of cells representing grid
- * @counter: array of textures representing key counter
- * @cards: array of textures representing text cards
+ * init_counter - initializes key counter text cards
+ * @renderer: pointer to renderer
+ * @count: key count
+ *
+ * Return: array of textures
 */
-void free_all(ray *rays, column *walls, entity *entities, sprite *sprites,
-rgba **texture, cell **grid, SDL_Texture **counter, SDL_Texture **cards) {
-	free(rays);
-	free(walls);
-	free(entities);
-	free_sprites(sprites, 20);
-	free_rgba(texture, 32);
-	free_grid(grid, 33);
-	free_texture(counter, 21);
-	free_texture(cards, 4);
+SDL_Texture **init_counter(SDL_Renderer *renderer, int count)
+{
+	int i;
+	SDL_Texture **counter = malloc(sizeof(SDL_Texture *) * count);
+
+	for (i = 0; i <= count; i++)
+	{
+		char *string, *countstr = malloc(sizeof(char) * 2);
+		SDL_Surface *surface;
+
+		SDL_itoa(i, countstr, 10);
+		string = concatenate("src/assets/", countstr, ".png");
+		surface = IMG_Load(string);
+		counter[i] = SDL_CreateTextureFromSurface(renderer, surface);
+		free(string), free(countstr);
+		SDL_FreeSurface(surface);
+	}
+	return (counter);
+}
+
+/**
+ * init_cards - initializes text cards
+ * @r: pointer to renderer
+ *
+ * Return: array of textures
+*/
+SDL_Texture **init_cards(SDL_Renderer *r)
+{
+	SDL_Texture **cards = malloc(sizeof(SDL_Texture *) * 6);
+
+	SDL_Surface *found = IMG_Load("src/assets/found.png");
+	SDL_Surface *all = IMG_Load("src/assets/allkeys.png");
+	SDL_Surface *need = IMG_Load("src/assets/needkeys.png");
+	SDL_Surface *complete = IMG_Load("src/assets/complete.png");
+	SDL_Surface *objective = IMG_Load("src/assets/objective.png");
+	SDL_Surface *quit = IMG_Load("src/assets/quit.png");
+
+	cards[FOUND] = SDL_CreateTextureFromSurface(r, found);
+	cards[ALL] = SDL_CreateTextureFromSurface(r, all);
+	cards[NEED] = SDL_CreateTextureFromSurface(r, need);
+	cards[COMPLETE] = SDL_CreateTextureFromSurface(r, complete);
+	cards[OBJECTIVE] = SDL_CreateTextureFromSurface(r, objective);
+	cards[QUIT] = SDL_CreateTextureFromSurface(r, quit);
+
+	SDL_FreeSurface(found);
+	SDL_FreeSurface(all);
+	SDL_FreeSurface(need);
+	SDL_FreeSurface(complete);
+	SDL_FreeSurface(objective);
+	SDL_FreeSurface(quit);
+
+	return (cards);
 }

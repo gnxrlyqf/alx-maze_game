@@ -11,20 +11,18 @@
  * game - main game loop
  * @m: map renderer
  * @d: display renderer
- * @d1: grid dimensions
- * @d2: world dimensions
+ * @dimensions: grid dimensions
 */
-void game(SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2)
+void game(SDL_Renderer *m, SDL_Renderer *d, coords dimensions)
 {
-	int size = 16, count = 20, i, t1, t2, faded = 0;
+	int size = 16, count = 20, i, t1, t2;
 	player p = {{24, 24}, PI / 2, {0, 0}, 0};
-	SDL_Rect e;
-	cell **grid = init_grid(d1, size);
+	cell **grid = init_grid(dimensions, size);
 	ray *rays = malloc(sizeof(ray) * 1260);
 	column *walls = malloc(sizeof(column) * 1260);
 	entity *entities = spawn_entities(grid);
 	sprite *sprites = malloc(sizeof(sprite) * count);
-	rgba **texture = init_texture("src/assets/bricks.png"), co = {0, 0, 0, 255};
+	rgba **texture = init_texture("src/assets/bricks.png");
 	SDL_Surface *key = IMG_Load("src/assets/key.png");
 	SDL_Texture **cards = init_cards(d), **counter = init_counter(d, 20), *c;
 
@@ -32,7 +30,7 @@ void game(SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2)
 		sprites[i].t = SDL_CreateTextureFromSurface(d, key);
 	while (1)
 	{
-		controls(grid, &p), rays = raycast(size, d1, grid, rays, p);
+		controls(grid, &p), rays = raycast(size, dimensions, grid, rays, p);
 		if (p.theta < 0)
 			p.theta += 2 * PI;
 		if (p.theta > 2 * PI)
@@ -46,13 +44,14 @@ void game(SDL_Renderer *m, SDL_Renderer *d, coords d1, coords d2)
 				c = cards[ALL];
 			t1 = time(NULL);
 		}
-		sprites = process_sprites(d, entities, sprites, count, p);
+		sprites = process_sprites(entities, sprites, count, p);
 		render(d, walls, sprites, count, texture);
-		draw_map(m, grid, d1, size, p.pos, rays, count, entities);
-		SDL_RenderCopy(d, counter[p.keys], NULL, NULL);
+		if (m)
+			draw_map(m, grid, dimensions, size, p.pos, rays, count, entities);
 		if (cards_events(d, p, cards, t1, &t2, &c) == 1)
 			break;
-		SDL_RenderPresent(d), SDL_RenderPresent(m);
+		SDL_RenderCopy(d, counter[p.keys], NULL, NULL);
+		SDL_RenderPresent(d);
 	}
 	free_all(rays, walls, entities, sprites, texture, grid, counter, cards);
 	SDL_FreeSurface(key);
@@ -105,4 +104,67 @@ void controls(cell **grid, player *p)
 		if (grid[(int)(p->pos.x / 16)][(int)(check.y / 16)].state != 1)
 			p->pos.y -= sin(strafe) * .8;
 	}
+}
+
+/**
+ * title - displays title screen
+ * @display: sdl renderer
+ *
+ * Return: gamestate (int)
+*/
+int title(SDL_Renderer *display)
+{
+	SDL_Surface *surface = IMG_Load("src/assets/title.png");
+	SDL_Texture *texture;
+	int out = 0, event = 0;
+
+	texture = SDL_CreateTextureFromSurface(display, surface);
+	while (1)
+	{
+		SDL_RenderCopy(display, texture, NULL, NULL);
+		SDL_RenderPresent(display);
+		event = events();
+		if (event == 1)
+		{
+			out = 0;
+			break;
+		}
+		if (event == 2)
+		{
+			out = 1;
+			break;
+		}
+	}
+	SDL_FreeSurface(surface);
+	SDL_DestroyTexture(texture);
+	return (out);
+}
+
+/**
+ * events - polls mouse and keyboard events
+ * Return: 1 (close window) 0 (no events)
+*/
+int events(void)
+{
+	SDL_Event event;
+	SDL_Keycode key;
+
+	while (SDL_PollEvent(&event))
+	{
+		switch (event.type)
+		{
+			case SDL_WINDOWEVENT:
+				if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+					return (1);
+				break;
+			case SDL_KEYDOWN:
+				key = event.key.keysym.sym;
+				if (key == SDLK_ESCAPE)
+					return (1);
+				if (key == SDLK_SPACE)
+					return (2);
+				break;
+		}
+	}
+	return (0);
 }

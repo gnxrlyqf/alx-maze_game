@@ -55,3 +55,26 @@ void free_texture(SDL_Texture **texture, int count)
 		SDL_DestroyTexture(texture[i]);
 	free(texture);
 }
+
+/**
+ * free_all - frees all allocated memory
+ * @rays: array of rays
+ * @walls: array of columns
+ * @entities: array of entities
+ * @sprites: array of sprites
+ * @texture: two dimensional array of pixels
+ * @grid: two dimensional array of cells representing grid
+ * @counter: array of textures representing key counter
+ * @cards: array of textures representing text cards
+*/
+void free_all(ray *rays, column *walls, entity *entities, sprite *sprites,
+rgba **texture, cell **grid, SDL_Texture **counter, SDL_Texture **cards) {
+	free(rays);
+	free(walls);
+	free(entities);
+	free_sprites(sprites, 20);
+	free_rgba(texture, 32);
+	free_grid(grid, 33);
+	free_texture(counter, 21);
+	free_texture(cards, 4);
+}

@@ -15,8 +15,8 @@
 */
 void render(SDL_Renderer *display, column *w, sprite *s, int c, rgba **texture)
 {
-	int i, j, texturex, si = 0;
-	SDL_Rect wall, floor = {0, 360, 1260, 360}, sky = {0, 0, 1260, 360};
+	int i, j, si = 0;
+	SDL_Rect wall, floor = {0, 360, 1260, 360};
 	rgba fog = {216, 217, 218, 0};
 	column curr;
 	sprite scurr;
@@ -42,7 +42,7 @@ void render(SDL_Renderer *display, column *w, sprite *s, int c, rgba **texture)
 			);
 			SDL_RenderFillRect(display, &wall);
 		}
-		if (scurr.dist < curr.dist)
+		if (scurr.dist < curr.dist && scurr.visible == 1)
 		{
 			SDL_SetRenderDrawColor(display, 255, 255, 255, 0);
 			SDL_RenderCopy(display, s[si].t, NULL, &s[si].rect);
@@ -93,6 +93,7 @@ int c, entity *entities) {
 		if (entities[i].exists == 1)
 			SDL_RenderFillRect(m, &e);
 	}
+	SDL_RenderPresent(m);
 }
 
 int cards_events(SDL_Renderer *d, player p, SDL_Texture **cards,
@@ -116,6 +117,7 @@ int t1, int *t, SDL_Texture **card) {
 			(*card) = cards[COMPLETE];
 			SDL_RenderCopy(d, *card, NULL, NULL);
 			SDL_RenderPresent(d);
+			SDL_Delay(4000);
 			return (1);
 		}
 	}

@@ -12,7 +12,7 @@ void maze(cell **grid, coords first, coords range)
 	int i, index;
 	coords f, offset[4] = {{2, 0}, {-2, 0}, {0, 2}, {0, -2}}, chosen;
 	coords size = {3, 3}, posstart = {1, 1}, posend = {29, 33};
-	frontier *head = malloc(sizeof(frontier)), *current;
+	frontier *head = malloc(sizeof(frontier));
 
 	head->cell = first, head->next = NULL, head->prev = NULL;
 	while (head)
