@@ -20,7 +20,6 @@ or
 ```sh
 gcc ./src/files/*.c ./src/files/main.h -o game -Wall -Werror -Wextra -pedantic -lSDL2 -lSDL2_image -lm -lpng
 ```
-
 ### Execution:
 Use `$ make run` or `$ ./game` to run the game<br/>
 Use `$ ./game exp` to run the game and enable minimap
