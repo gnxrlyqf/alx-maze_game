@@ -17,8 +17,8 @@ $ git clone https://github.com/gnxrlyqf/alx-maze_game.git
 $ make build
 ```
 ### Execution:
-`$ make run` or `$ ./game` to run the game
-`$ ./game exp` to run the game and enable minimaps
+Use `$ make run` or `$ ./game` to run the game
+Use `$ ./game exp` to run the game and enable minimaps
 ### Controls
 Use `W`, `A`, `S` & `D` to move `forward`, `left`, `backwards` & `right` respectively
 Use `left arrow` & `right arrow` to turn the camera `left` and `right`
