@@ -25,5 +25,5 @@ Use `left arrow` & `right arrow` to turn the camera `left` and `right`
 
 ## Credits
 
-<[Mohamed Youssef Chetoui](https://github.com/gnxrlyqf)>: Lead developer and game designer<br/>
-Wall textures by <[wonniie](https://www.instagram.com/wonniiz/)>
+[Mohamed Youssef Chetoui](https://github.com/gnxrlyqf): Lead developer and game designer<br/>
+Wall textures by [wonniie](https://www.instagram.com/wonniiz/)
