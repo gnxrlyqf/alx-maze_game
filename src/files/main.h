@@ -14,24 +14,24 @@ typedef struct SDL_instance
 } SDL_instance;
 
 /**
- * struct coords - x/y pair of ints
+ * struct vector2 - x/y pair of ints
  * @x: x
  * @y: y
 */
-typedef struct coords
+typedef struct vector2
 {
 	int x, y;
-} coords;
+} vector2;
 
 /**
- * struct coordsf - x/y pair of floats
+ * struct fvector2 - x/y pair of floats
  * @x: x
  * @y: y
 */
-typedef struct coordsf
+typedef struct fvector2
 {
 	float x, y;
-} coordsf;
+} fvector2;
 
 /**
  * struct cell - grid cell
@@ -42,7 +42,7 @@ typedef struct coordsf
 */
 typedef struct cell
 {
-	coords pos;
+	vector2 pos;
 	int size;
 	int state;
 	int valid;
@@ -57,7 +57,7 @@ typedef struct cell
 */
 typedef struct ray
 {
-	coordsf pos;
+	fvector2 pos;
 	float val, theta, dir;
 } ray;
 
@@ -69,7 +69,7 @@ typedef struct ray
 */
 typedef struct frontier
 {
-	coords cell;
+	vector2 cell;
 	struct frontier *prev, *next;
 } frontier;
 
@@ -115,7 +115,7 @@ typedef struct sprite
 typedef struct entity
 {
 	int behavior, exists;
-	coordsf pos;
+	fvector2 pos;
 	float z;
 } entity;
 
@@ -131,7 +131,7 @@ typedef struct entity
 */
 typedef struct column
 {
-	coords pos;
+	vector2 pos;
 	float line, s, f, dist;
 	int x;
 	char *texture;
@@ -146,38 +146,38 @@ typedef struct column
 */
 typedef struct player
 {
-	coordsf pos;
+	fvector2 pos;
 	float theta;
-	coordsf d;
+	fvector2 d;
 	int keys;
 } player;
 
-int init_window(SDL_instance *instance, coords dim, char *name, coords pos);
-void draw_map(SDL_Renderer *m, cell **g, coords d, int s, coordsf p, ray *r,
+int init_window(SDL_instance *instance, vector2 dim, char *name, vector2 pos);
+void draw_map(SDL_Renderer *m, cell **g, vector2 d, int s, fvector2 p, ray *r,
 int c, entity *entities);
-cell **init_grid(coords dimensions, int cellSize);
+cell **init_grid(vector2 dimensions, int cellSize);
 int events(void);
 void free_grid(cell **grid, int rows);
 void controls(cell **grid, player *p);
-void game(SDL_Renderer *m, SDL_Renderer *d, coords d1);
-ray *raycast(int size, coords dim, cell **grid, ray *rays, player p);
-float distance(coordsf a, coordsf b);
-ray horizontal(float rtheta, int size, coords dim, cell **grid, coordsf pos);
-ray vertical(float rtheta, int size, coords dim, cell **grid, coordsf pos);
+void game(SDL_Renderer *m, SDL_Renderer *d, vector2 d1);
+ray *raycast(int size, vector2 dim, cell **grid, ray *rays, player p);
+float distance(fvector2 a, fvector2 b);
+ray horizontal(float rtheta, int size, vector2 dim, cell **grid, fvector2 pos);
+ray vertical(float rtheta, int size, vector2 dim, cell **grid, fvector2 pos);
 int ftoi(float x);
 void process_rays(ray *rays, column **walls, int size, float theta);
 void render(SDL_Renderer *display, column *w, sprite *s, int c,
 rgba **texture);
-void maze(cell **grid, coords first, coords range);
-frontier *add(frontier **head, coords new);
+void maze(cell **grid, vector2 first, vector2 range);
+frontier *add(frontier **head, vector2 new);
 frontier *get(frontier *head, int index);
 int delete(frontier **head, unsigned int index);
 int listlen(const frontier *h);
 rgba **init_texture(char *file);
-void patch(cell **grid, coords size, coords pos);
+void patch(cell **grid, vector2 size, vector2 pos);
 sprite *process_sprites(entity *e, sprite *s, int c, player p);
 entity *spawn_entities(cell **grid);
-float distancei(coords a, coords b);
+float distancei(vector2 a, vector2 b);
 int check_entities(player *p, entity **keys, int size);
 int title(SDL_Renderer *display);
 void free_rgba(rgba **arr, int size);

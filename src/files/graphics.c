@@ -64,7 +64,7 @@ void render(SDL_Renderer *display, column *w, sprite *s, int c, rgba **texture)
  * @c: entity count
  * @entities: array of entities
 */
-void draw_map(SDL_Renderer *m, cell **g, coords d, int s, coordsf p, ray *r,
+void draw_map(SDL_Renderer *m, cell **g, vector2 d, int s, fvector2 p, ray *r,
 int c, entity *entities) {
 	int i, j;
 	SDL_Rect player = {p.x - 4, p.y - 4, 8, 8}, cell, e;

@@ -13,7 +13,7 @@
  * @d: display renderer
  * @dimensions: grid dimensions
 */
-void game(SDL_Renderer *m, SDL_Renderer *d, coords dimensions)
+void game(SDL_Renderer *m, SDL_Renderer *d, vector2 dimensions)
 {
 	int size = 16, count = 20, i, t1, t2;
 	player p = {{24, 24}, PI / 2, {0, 0}, 0};
@@ -65,7 +65,7 @@ void game(SDL_Renderer *m, SDL_Renderer *d, coords dimensions)
 void controls(cell **grid, player *p)
 {
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-	coordsf check;
+	fvector2 check;
 	float strafe = p->theta - 90 * DEG;
 
 	if (keystate[SDL_SCANCODE_LEFT])

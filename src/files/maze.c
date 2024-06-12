@@ -7,11 +7,11 @@
  * @first: starting cell of the algorithm
  * @range: maximum position to traverse
 */
-void maze(cell **grid, coords first, coords range)
+void maze(cell **grid, vector2 first, vector2 range)
 {
 	int i, index;
-	coords f, offset[4] = {{2, 0}, {-2, 0}, {0, 2}, {0, -2}}, chosen;
-	coords size = {3, 3}, posstart = {1, 1}, posend = {29, 33};
+	vector2 f, offset[4] = {{2, 0}, {-2, 0}, {0, 2}, {0, -2}}, chosen;
+	vector2 size = {3, 3}, posstart = {1, 1}, posend = {29, 33};
 	frontier *head = malloc(sizeof(frontier));
 
 	head->cell = first, head->next = NULL, head->prev = NULL;
@@ -35,7 +35,6 @@ void maze(cell **grid, coords first, coords range)
 	}
 	patch(grid, size, posstart);
 	patch(grid, size, posend);
-
 }
 
 /**
@@ -45,7 +44,7 @@ void maze(cell **grid, coords first, coords range)
  *
  * Return: pointer to the newly added node
 */
-frontier *add(frontier **head, coords new)
+frontier *add(frontier **head, vector2 new)
 {
 	frontier *node, *last;
 

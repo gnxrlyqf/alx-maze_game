@@ -12,9 +12,9 @@ int main(int argc, char **argv)
 {
 	SDL_instance map, display;
 	int size = 16, gamestate = 0, arg;
-	coords dimensions1 = {33 * size, 37 * size}, dimensions2 = {1260, 720};
-	coords pos1 = {100, 150};
-	coords pos2 = {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED};
+	vector2 dimensions1 = {33 * size, 37 * size}, dimensions2 = {1260, 720};
+	vector2 pos1 = {100, 150};
+	vector2 pos2 = {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED};
 
 	map.renderer = NULL;
 	if (argc > 2)
@@ -46,5 +46,4 @@ int main(int argc, char **argv)
 	SDL_DestroyWindow(map.window), SDL_DestroyWindow(display.window);
 	SDL_Quit();
 	return (0);
-
 }

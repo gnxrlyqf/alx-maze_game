@@ -8,7 +8,7 @@
  *
  * Return: distance between two points
 */
-float distance(coordsf a, coordsf b)
+float distance(fvector2 a, fvector2 b)
 {
 	return (sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2)));
 }
@@ -21,7 +21,7 @@ float distance(coordsf a, coordsf b)
  * Return: distance between two points
 */
 
-float distancei(coords a, coords b)
+float distancei(vector2 a, vector2 b)
 {
 	return (sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2)));
 }
@@ -50,7 +50,7 @@ int ftoi(float x)
  * @size: cell size
  * @pos: position to put the patch
 */
-void patch(cell **grid, coords size, coords pos)
+void patch(cell **grid, vector2 size, vector2 pos)
 {
 	int i, j;
 

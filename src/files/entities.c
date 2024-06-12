@@ -10,8 +10,8 @@
 */
 entity *spawn_entities(cell **grid)
 {
-	coords offsets[4] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-	coords r;
+	vector2 offsets[4] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+	vector2 r;
 	int i, j, count = 20, sides;
 	entity *entities = malloc(sizeof(entity) * count);
 
@@ -55,8 +55,8 @@ entity *spawn_entities(cell **grid)
 int check_entities(player *p, entity **keys, int size)
 {
 	int i;
-	coords pos = {(int)((*p).pos.x / 16), (int)((*p).pos.y / 16)};
-	coords key;
+	vector2 pos = {(int)((*p).pos.x / 16), (int)((*p).pos.y / 16)};
+	vector2 key;
 
 	for (i = 0; i < size; i++)
 	{

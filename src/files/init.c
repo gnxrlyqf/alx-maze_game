@@ -1,15 +1,15 @@
 #include "main.h"
-#include <SDL2/SDL_image.h>
-#include <png.h>
-#include <zlib.h>
 #include <stdlib.h>
 #include <time.h>
+#include <png.h>
+#include <zlib.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-cell **init_grid(coords res, int cellSize)
+cell **init_grid(vector2 res, int cellSize)
 {
-	coords dim = {res.x / cellSize, res.y / cellSize};
-	coords start = {15, 15};
+	vector2 dim = {res.x / cellSize, res.y / cellSize};
+	vector2 start = {15, 15};
 	cell **grid = malloc(dim.x * sizeof(cell *));
 
 	srand(time(NULL));
@@ -42,7 +42,7 @@ cell **init_grid(coords res, int cellSize)
  *
  * Return: 0 (Success)
 */
-int init_window(SDL_instance *instance, coords dim, char *name, coords pos)
+int init_window(SDL_instance *instance, vector2 dim, char *name, vector2 pos)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{

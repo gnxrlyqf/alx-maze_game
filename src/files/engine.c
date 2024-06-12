@@ -15,7 +15,7 @@
  *
  * Return: array of rays hit
 */
-ray *raycast(int size, coords dim, cell **grid, ray *rays, player p)
+ray *raycast(int size, vector2 dim, cell **grid, ray *rays, player p)
 {
 	dim.x = dim.x / size;
 	dim.y = dim.y / size;
@@ -56,11 +56,11 @@ ray *raycast(int size, coords dim, cell **grid, ray *rays, player p)
  *
  * Return: resulting ray
 */
-ray horizontal(float rtheta, int size, coords dim, cell **grid, coordsf pos)
+ray horizontal(float rtheta, int size, vector2 dim, cell **grid, fvector2 pos)
 {
-	coordsf offset;
+	fvector2 offset;
 	ray ray, out;
-	coords map;
+	vector2 map;
 	int dof = 0;
 	float length = 999999999;
 
@@ -106,11 +106,11 @@ ray horizontal(float rtheta, int size, coords dim, cell **grid, coordsf pos)
  *
  * Return: resulting ray
 */
-ray vertical(float rtheta, int size, coords dim, cell **grid, coordsf pos)
+ray vertical(float rtheta, int size, vector2 dim, cell **grid, fvector2 pos)
 {
-	coordsf offset;
+	fvector2 offset;
 	ray ray, out;
-	coords map;
+	vector2 map;
 	int dof = 0;
 	float length = 999999999;
 
@@ -203,7 +203,7 @@ sprite *process_sprites(entity *e, sprite *s, int c, player p)
 	float scale;
 	entity curr;
 	SDL_Rect draw;
-	coordsf temp, result;
+	fvector2 temp, result;
 
 	for (i = 0; i < c; i++)
 	{
