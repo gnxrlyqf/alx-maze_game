@@ -18,7 +18,7 @@ $ make build
 ```
 ### Execution:
 Use `$ make run` or `$ ./game` to run the game<br/>
-Use `$ ./game exp` to run the game and enable minimaps
+Use `$ ./game exp` to run the game and enable minimap
 ### Controls
 Use `W`, `A`, `S` & `D` to move `forward`, `left`, `backwards` & `right` respectively<br/>
 Use `left arrow` & `right arrow` to turn the camera `left` and `right`
