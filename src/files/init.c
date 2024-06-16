@@ -1,8 +1,7 @@
 #include "main.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <png.h>
-#include <zlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
@@ -80,32 +79,23 @@ int init_window(SDL_instance *instance, vector2 dim, char *name, vector2 pos)
 rgba **init_texture(char *file)
 {
 	int i, j = 0;
-	png_image image;
-	png_bytep buff;
 	rgba **texture = malloc(32 * sizeof(rgba *));
+	SDL_Surface *surface = IMG_Load(file);
+	Uint32 pixel;
 
-	memset(&image, 0, sizeof(image));
-	image.version = PNG_IMAGE_VERSION;
-	if (png_image_begin_read_from_file(&image, file) != 0)
+	for (i = 0; i < 32; i++)
 	{
-		image.format = PNG_FORMAT_RGBA;
-		buff = malloc(PNG_IMAGE_SIZE(image));
-		if (buff && png_image_finish_read(&image, NULL, buff, 0, NULL) != 0)
+		texture[i] = malloc(32 * sizeof(rgba));
+		for (j = 0; j < 32; j++)
 		{
-			for (i = 0; i < 32; i++)
-			{
-				texture[i] = malloc(32 * sizeof(rgba));
-				for (j = 0; j < 32; j++)
-				{
-					texture[i][j].r = buff[(i + (j * 32)) * 4];
-					texture[i][j].g = buff[(i + (j * 32)) * 4 + 1];
-					texture[i][j].b = buff[(i + (j * 32)) * 4 + 2];
-					texture[i][j].a = buff[(i + (j * 32)) * 4 + 3];
-				}
-			}
+			pixel = getpixel(surface, i, j);
+			texture[i][j].r = pixel & 0xFF;
+			texture[i][j].g = (pixel >> 8) & 0xFF;
+			texture[i][j].b = (pixel >> 16) & 0xFF;
+			texture[i][j].a = (pixel >> 24) & 0xFF;
 		}
 	}
-	free(buff);
+	SDL_FreeSurface(surface);
 	return (texture);
 }
 
