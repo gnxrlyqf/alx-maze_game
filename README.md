@@ -13,13 +13,15 @@ This project was written in C (game engine & logic) with the help of the SDL2 re
 $ git clone https://github.com/gnxrlyqf/alx-maze_game.git
 ```
 ### Compilation:
+For Linux:
 ```sh
 $ make build
 ```
-or
+For Windows
 ```sh
-$ gcc ./src/files/* -o game -Wall -Werror -Wextra -pedantic -lSDL2 -lSDL2_image -lm -lpng
+$ make build-w
 ```
+! Note that Windows Defender might flag the executable as a virus. !
 ### Execution:
 Use `$ make run` or `$ ./game` to run the game<br/>
 Use `$ ./game exp` to run the game and enable minimap
