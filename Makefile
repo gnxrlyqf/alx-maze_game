@@ -5,8 +5,6 @@ WLIBS = -I dependencies/SDL2-2.30.3/i686-w64-mingw32/include/SDL2 \
 -L dependencies/SDL2-2.30.3/i686-w64-mingw32/lib \
 -I dependencies/SDL2_image-2.6.0/i686-w64-mingw32/include \
 -L dependencies/SDL2_image-2.6.0/i686-w64-mingw32/lib \
--I dependencies/mingw64/include \
--L dependencies/mingw64/lib \
 -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows
 
 build:
