@@ -23,7 +23,7 @@ $ make build-w
 ```
 ! Note that Windows Defender might flag the executable as a virus. !
 ### Execution:
-Use `$ make run` or `$ ./game` (`game.exe` for Windows)to run the game<br/>
+Use `$ make run` or `$ ./game` (`game.exe` for Windows) to run the game<br/>
 Use `$ ./game exp` to run the game and enable minimap
 ### Controls
 Use `W`, `A`, `S` & `D` to move `forward`, `left`, `backwards` & `right` respectively<br/>
