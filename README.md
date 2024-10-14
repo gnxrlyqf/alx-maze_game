@@ -19,7 +19,7 @@ $ make build
 ```
 For Windows
 ```sh
-$ make build-w
+just switch to linux
 ```
 ! Note that Windows Defender might flag the executable as a virus. !
 ### Execution:
